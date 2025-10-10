@@ -1,0 +1,27 @@
+  <lib-hlt-table
+  style="height: 90vh; display: flex;"
+    [tableHeading]="tableHeading"
+    [showNav]="false"
+    [tableData]="tableData"
+    [usePagination]="true"
+    [totalItems]="totalItems"
+    [currentPageIndex]="currentPageIndex"
+    [customActionTemplate]="enableTemplate"
+    (page)="onPageChange($event)"
+    (search)="onSearch($event)">
+    <ng-template #enableTemplate let-row>
+      <div class="ignoreTax-ignoreDiscount d-flex justify-content-around mt-3 mb-4">
+        <div class="ignoreTax d-flex">
+          <div class="form-check form-switch ms-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'enableToggle-' + row.id"
+              [checked]="row.enabled"
+              (change)="onToggleEnable(row, $event)"
+            >
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </lib-hlt-table>

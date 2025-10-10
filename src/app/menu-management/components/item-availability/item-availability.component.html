@@ -1,0 +1,46 @@
+<div class="menu-management-main">
+  <div class="menu-controls">
+        <h2 class="menu-items-heading m-0">Set Item Availability</h2>
+        <div class="search-filter">
+          <input type="text" placeholder="Search by name or code..." class="search-input">
+          <button class="btn filter-btn d-flex" style="background-color: rgba(243, 244, 246, 1); color: rgba(55, 65, 81, 1);">
+            <mat-icon>filter_alt</mat-icon> Filter
+          </button>
+        </div>
+      </div>
+    <app-hlt-table
+      style="height: 100%;"
+      [tableHeading]="tableHeading"
+      [tableData]="(allItems$ | async) ?? []"
+      [usePagination]="true"
+      [totalItems]="(totalElements$ | async) ?? 0"
+      [currentPageIndex]="pageIndex"
+      (search)="onSearch($event)"
+      (page)="onPageChange($event)"
+      [customActionTemplate]="enableTemplate"
+      [showDefaultActions]="false"
+      [showNav]="false"
+    >
+      <ng-template #enableTemplate let-row>
+        <div class="ignoreTax-ignoreDiscount d-flex justify-content-around mt-3 mb-4">
+          <div class="ignoreTax d-flex flex-column">
+            <div class="form-check form-switch ms-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'enableToggle-' + row.id"
+                [checked]="row.available"
+                (change)=" toggleAvailability(row, $event)"
+              >
+            </div>
+            <span class="text-sm text-gray-600 mt-2" *ngIf="row.available && row.enabledTime">
+              Enabled at: {{ row.enabledTime }}
+            </span>
+            <span class="text-sm text-gray-600 mt-2 text-danger" *ngIf="!row.available && row.scheduledEndTime">
+              available after {{ row.scheduledEndTime }}
+            </span>
+          </div>
+        </div>
+      </ng-template>
+    </app-hlt-table>
+</div>

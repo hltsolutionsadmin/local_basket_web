@@ -1,0 +1,38 @@
+<div class="page-container">
+  <div class="main-content-wrapper" [class.panel-open]="isAddEditPanelOpen">
+    <div class="menu-items-list-wrapper">
+      <div class="menu-controls">
+        <h2 class="menu-items-heading m-0">Menu Items</h2>
+        <div class="search-filter">
+          <input type="search" placeholder="Search by name or code..." class="search-input" (input)="onSearch($event)">
+          <button class="btn filter-btn d-flex" style="background-color: rgba(243, 244, 246, 1); color: rgba(55, 65, 81, 1);">
+            <mat-icon>filter_alt</mat-icon> Filter
+          </button>
+          <button class="add-button" (click)="openAddPanel()">+ Add</button>
+        </div>
+      </div>
+      <app-hlt-table
+        class="flex-grow-1 d-flex"
+        style="height: 87%; flex-direction: column;"
+        [tableHeading]="tableHeading"
+        [tableData]="(allItems$ | async) ?? []"
+        [usePagination]="true"
+        [totalItems]="(totalElements$ | async) ?? 0"
+        [currentPageIndex]="pageIndex"
+        [showNav]="false"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+        (page)="onPageChange($event)">
+      </app-hlt-table>
+    </div>
+
+    <div class="add-edit-panel" *ngIf="isAddEditPanelOpen">
+      <app-add-edit-menu
+      class="p-3"
+        [data]="selectedItemForPanel"
+        (formSubmitted)="onAddEditFormSubmitted($event)"
+        (formCancelled)="onAddEditFormCancelled()">
+      </app-add-edit-menu>
+    </div>
+  </div>
+</div>

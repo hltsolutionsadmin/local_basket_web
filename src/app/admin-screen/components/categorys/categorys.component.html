@@ -1,0 +1,24 @@
+<nav class="navbar navbar-light bg-light justify-content-between">
+  <div class="search-main">
+    <div class="search-box">
+      <input type="text" placeholder="Search Items" class="search-input">
+      <a class="search-btn">
+        <mat-icon>search</mat-icon>
+      </a>
+    </div>
+  </div>
+  <div class="courses-nav-button">
+    <button type="button" class="btn" (click)="openAddCategoryDialog()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</nav>
+<div class="container">
+  <div class="card-grid">
+    <div class="card" *ngFor="let category of categories">
+      <mat-icon class="d-flex align-item-center p-1" style="font-size: 16px; align-items: center; position: absolute; color: red;" (click)="openDeleteConfirmDialog(category)">delete</mat-icon>
+      <img [src]="getCategoryImage(category)" alt="{{category.name}}" class="card-image">
+      <p class="card-button">{{category.name}}</p>
+    </div>
+  </div>
+</div>

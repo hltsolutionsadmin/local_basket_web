@@ -1,0 +1,17 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Confirm Location</h2>
+  <mat-dialog-content>
+    <p><strong>Address:</strong> {{ data.display_name }}</p>
+    <p><strong>Street:</strong> {{ data.address.road || 'N/A' }}</p>
+    <p><strong>City:</strong> {{ data.address.city || 'N/A' }}</p>
+    <p><strong>State:</strong> {{ data.address.state || 'N/A' }}</p>
+    <p><strong>Country:</strong> {{ data.address.country || 'N/A' }}</p>
+    <p><strong>Postal Code:</strong> {{ data.address.postcode || 'N/A' }}</p>
+    <p><strong>Latitude:</strong> {{ data.lat }}</p>
+    <p><strong>Longitude:</strong> {{ data.lon }}</p>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onConfirm()">OK</button>
+  </mat-dialog-actions>
+</div>

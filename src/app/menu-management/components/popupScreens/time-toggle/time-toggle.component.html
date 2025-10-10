@@ -1,0 +1,37 @@
+<div class="" style="display: flex; align-items: center; justify-content: space-between; padding: .5rem;">
+  <h2 mat-dialog-title class="p-0 m-0 d-flex justify-content-center align-items-center">Schedule Item Unavailability</h2>
+  <mat-icon (click)="dialogRef.close()">cancel</mat-icon>
+</div>
+<mat-dialog-content>
+  <div *ngIf="!showTimePicker" class="dropdown-container">
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Select Duration</mat-label>
+      <mat-select [(ngModel)]="selectedDuration" (selectionChange)="onDurationChange()">
+        <mat-option *ngFor="let hour of hours" [value]="hour">{{ hour }}hr</mat-option>
+         <mat-option [value]="hour">Next Business Day</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div *ngIf="showTimePicker" class="time-container">
+    <div class="time-section">
+      <button mat-icon-button (click)="increaseHour()"><mat-icon>arrow_drop_up</mat-icon></button>
+      <div class="time-value">{{ pad(hour) }}</div>
+      <button mat-icon-button (click)="decreaseHour()"><mat-icon>arrow_drop_down</mat-icon></button>
+    </div>
+    <div class="colon">:</div>
+    <div class="time-section">
+      <button mat-icon-button (click)="increaseMinute()"><mat-icon>arrow_drop_up</mat-icon></button>
+      <div class="time-value">{{ pad(minute) }}</div>
+      <button mat-icon-button (click)="decreaseMinute()"><mat-icon>arrow_drop_down</mat-icon></button>
+    </div>
+    <div class="time-section meridian">
+      <div class="time-value">{{ meridian.toUpperCase() }}</div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="toggleTimePicker()">Enter Manually</button>
+  <button mat-button (click)="onOffImmediately()">Off Immediately</button>
+  <button mat-button color="primary" (click)="onSave()">Save</button>
+</mat-dialog-actions>

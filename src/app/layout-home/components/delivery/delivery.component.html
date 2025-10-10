@@ -1,0 +1,139 @@
+<div class="page-container">
+  <div class="content-area" [class.panel-open]="isOrderDetailsPanelOpen">
+    <div class="orders-list">
+      <div class="top-bar">
+        <div class="Orders">
+          <p class="m-0">Orders</p>
+        </div>  
+        <div class="search-section">
+          <input type="text" class="form-control" placeholder="Search orders..." [(ngModel)]="searchTerm" (input)="applyFilter()">
+          <button class="btn btn-primary filter-btn d-flex" (click)="toggleFilter()">
+            <mat-icon>filter_alt</mat-icon> Filter
+          </button>
+        </div>
+      </div>
+      <div class="grid-container">
+        <div *ngIf="loading" class="text-center p-4">Loading orders...</div>
+        <div *ngIf="!loading && !tableData.length" class="text-center p-4">No new orders found.</div>
+
+        <div class="order-card" *ngFor="let order of tableData;">
+          <div class="order-details-left">
+            <div class="order-header">
+              <span class="order-status-badge {{ getOrderStatusClass(order.orderStatus) }}">{{ formatOrderStatus(order.orderStatus) }}</span>
+              <span class="order-number">#{{ order.orderNumber }}</span>
+              <span class="order-time">{{ formatUpdatedDate(order.updatedDate) }}</span>
+              <div id="time" *ngIf="order.orderStatus === 'PREPARING'" class="time">
+                <mat-icon style="font-size: 12px; display: flex; align-items: center; justify-content: center;" class="mat-18">access_time</mat-icon>
+                {{ order.timmimgs }}Min
+              </div>
+            </div>
+            <div class="customer-info">
+              <p class="customer-name m-0">{{ order.username }}</p>
+            </div>
+            <div class="item-list">
+              <div *ngFor="let item of order.itemsArray;" class="item-row">
+                <mat-icon class="d-flex align-items-center" style="font-size: 15px;">delivery_dining</mat-icon>
+                <span class="item-quantity">{{ item.quantity }}x</span>
+                <span class="item-name">{{ item.productName }}</span>
+                <span class="item-price ms-1">₹{{ item.price }}</span>
+              </div>
+              <div class="order-totals d-flex">
+                <mat-icon style="font-size: 15px; display: flex; align-items: center;">money_off</mat-icon>
+                <p class="m-0">Total: <strong>{{ order.totalAmount }}</strong></p>
+              </div>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <ng-container *ngIf="order.orderStatus === 'PLACED'">
+              <button type="button" class="btn btn-outline-dark btn-sm" (click)="rejectOrder(order, '', '')">Reject</button>
+              <button type="button" class="btn btn-outline-dark btn-sm" (click)="handleAcceptClick(order)">Accept</button>
+              <!-- (click)="handleAcceptClick(order)" -->
+            </ng-container>
+            <ng-container *ngIf="order.orderStatus !== 'PLACED' && order.orderStatus !== 'REJECTED'">
+              <button type="button" class="btn btn-outline-dark btn-sm" (click)="openOrderDetails(order)">View Details</button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <mat-paginator [length]="totalItems" [pageSize]="pageSize" [pageIndex]="currentPageIndex" (page)="onPageChange($event.pageIndex)" aria-label="Select page">
+      </mat-paginator>
+    </div>
+
+    <div class="order-details-panel" [class.open]="isOrderDetailsPanelOpen">
+      <div class="panel-header">
+        <h5>Order Details</h5>
+        <button class="close-btn" (click)="closeOrderDetailsPanel()">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </div>
+
+      <div class="panel-content" *ngIf="selectedOrder">
+         <div class="order-info-summary">
+          <h6 class="order-id"># Delivery Person Details</h6>
+          <p class="customer-name-details">
+            <mat-icon>person</mat-icon>
+            {{ selectedOrder.deliveryPartnerName }}
+          </p>
+          <p class="customer-contact">
+            <mat-icon>phone</mat-icon>
+            +91 {{ selectedOrder.deliveryPartnerMobileNumber }}
+          </p>
+        </div>
+        <div class="order-info-summary">
+          <h6 class="order-id"># User Details</h6>
+          <h6 class="order-id">#{{ selectedOrder.orderNumber }}</h6>
+          <p class="customer-name-details">
+            <mat-icon>person</mat-icon>
+            {{ selectedOrder.username }}
+          </p>
+          <p class="customer-contact">
+            <mat-icon>phone</mat-icon>
+            +91 {{ selectedOrder.mobileNumber }}
+          </p>
+        </div>
+
+        <div class="order-items-details">
+          <h6>Order Items</h6>
+          <div *ngFor="let item of selectedOrder.itemsArray;" class="item-detail-row">
+            <span class="item-qty">{{ item.quantity }}</span>
+            <span class="item-name-detail">{{ item.productName }}</span>
+            <span class="item-price-detail">₹{{ item.price }}</span>
+          </div>
+        </div>
+
+        <div class="order-items-details">
+          <h6>Description</h6>
+          <div class="item-detail-row">
+            <span>{{ selectedOrder.notes }}</span> 
+          </div>
+        </div>
+
+        <div class="order-summary-details">
+          <div class="summary-row total-row"><span>Total</span>: <span>{{ selectedOrder.totalAmount }}</span></div>
+        </div>
+
+        <div class="delivery-info">
+          <h6>Delivery Information</h6>
+          <p class="d-flex m-0"><mat-icon>my_location</mat-icon>{{ selectedOrder.address }}</p>
+          <p class="d-flex m-0"><mat-icon>payment</mat-icon> Payment: Online</p>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="d-flex justify-content-around">
+          <ng-container *ngIf="selectedOrder?.orderStatus === 'PREPARING'">
+            <button class="btn btn-primary btn-lg btn-block" (click)="markReadyForPickup(selectedOrder)">Ready for Pickup</button>
+            <button class="btn btn-success btn-lg btn-block" (click)="regenerateKot(selectedOrder)">KOT Regeneration</button>
+          </ng-container>
+          <ng-container *ngIf="selectedOrder?.orderStatus === 'OUT_FOR_DELIVERY'">
+            <button class="btn btn-success btn-lg btn-block" (click)="regenerateKot(selectedOrder)">KOT Regeneration</button>
+          </ng-container>
+          <ng-container *ngIf="selectedOrder?.orderStatus === 'CONFIRMED'">
+            <button class="btn btn-success btn-lg btn-block" (click)="performKotAction(selectedOrder)">KOT</button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

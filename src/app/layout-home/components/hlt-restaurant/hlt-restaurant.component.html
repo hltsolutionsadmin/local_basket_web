@@ -1,0 +1,7 @@
+<mat-form-field appearance="fill" class="w-full" style="width: 100%;">
+  <mat-label>{{ label }}</mat-label>
+  <textarea matInput [formControl]="textareaControl" (input)="onInput($event)" rows="2"></textarea>
+  <mat-error *ngIf="textareaControl.hasError('required')">
+    {{ label }} is required
+  </mat-error>
+</mat-form-field>

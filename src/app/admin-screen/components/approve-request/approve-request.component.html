@@ -1,0 +1,21 @@
+<div class="container">
+  <lib-hlt-table
+  style="height: 90vh;"
+    [tableHeading]="tableHeading"
+    [showNav]="false"
+    [tableData]="tableData"
+    [usePagination]="true"
+    [totalItems]="totalItems"
+    [currentPageIndex]="currentPageIndex"
+    [customActionTemplate]="approveTemplate"
+    (page)="onPageChange($event)"
+    (search)="onSearch($event)">
+    <ng-template #approveTemplate let-row>
+      <lib-hlt-button
+        [buttonName]="'Approve'"
+        [styles]="'font-size: 12px'"
+        (OnClick)="onApprove(row)"
+      ></lib-hlt-button>
+    </ng-template>
+  </lib-hlt-table>
+</div>

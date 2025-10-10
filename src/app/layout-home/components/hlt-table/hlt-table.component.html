@@ -1,0 +1,69 @@
+<div class="table-container">
+  <nav class="card navbars" *ngIf="showNav">
+    <div class="search-main">
+      <div class="search-box">
+        <input type="text" placeholder="Search by name or code..." class="search-input" (input)="onSearch($event)">
+        <a class="search-btn">
+          <mat-icon>search</mat-icon>
+        </a>
+      </div>
+    </div>
+    <div class="courses-nav-button">
+      <button type="button" class="btn" (click)="addItem.emit()">
+        <mat-icon>add</mat-icon> Add
+      </button>
+    </div>
+  </nav>
+  <div class="table-content-wrapper">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container *ngFor="let column of tableHeading" [matColumnDef]="column.data">
+        <th mat-header-cell *matHeaderCellDef class="fixed-header"> {{ column.heading }} </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'action-cell': column.data === 'actions'}">
+          <ng-container [ngSwitch]="column.data">
+            <ng-container *ngSwitchCase="'itemCode'">{{ element[column.data] }}</ng-container>
+            <ng-container *ngSwitchCase="'imgUrl'">
+              {{ element.itemName }}
+            </ng-container>
+            <ng-container *ngSwitchCase="'category'">
+              <span class="category-badge" [style.backgroundColor]="rowStyles[column.data]">{{ element[column.data] }}</span>
+            </ng-container>
+            <ng-container *ngSwitchCase="'itemPrice'">{{ element[column.data] }}</ng-container>
+            <ng-container *ngSwitchCase="'status'">
+              <span class="status-badge" [style.backgroundColor]="statusColors[element[column.data].toLowerCase()] || 'rgba(243, 244, 246, 1)'">
+                {{ element[column.data] }}
+              </span>
+            </ng-container>
+            <ng-container *ngSwitchCase="'actions'">
+              <ng-container *ngIf="customActionTemplate; else defaultActions">
+                <ng-container *ngTemplateOutlet="customActionTemplate; context: { $implicit: element }"></ng-container>
+              </ng-container>
+              <ng-template #defaultActions>
+                <button *ngIf="showDefaultActions" mat-icon-button color="primary" (click)="edit.emit(element)" class="action-btn">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button *ngIf="showDefaultActions" mat-icon-button color="warn" (click)="delete.emit(element)" class="action-btn delete-btn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </ng-template>
+            </ng-container>
+            <ng-container *ngSwitchDefault>{{ element[column.data] }}</ng-container>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="fixed-header-row"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-row"></tr>
+    </table>
+  </div>
+  <div *ngIf="usePagination" class="paginator-container">
+    <span class="total-items">{{ totalItems }} items</span>
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="10"
+      [pageSizeOptions]="[10]"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+      class="custom-paginator">
+    </mat-paginator>
+  </div>
+</div>

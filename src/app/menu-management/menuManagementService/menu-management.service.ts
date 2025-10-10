@@ -1,0 +1,163 @@
+import { inject, Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Category } from '../models/interface.model';
+import { ApiConfigService } from '../../core/service/api-config.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MenuManagementService {
+
+  http = inject(HttpClient)
+  apiConfig = inject(ApiConfigService)
+  constructor() { }
+
+  jsonHeaders = new HttpHeaders({
+    'Content-Type': 'application/json'
+  });
+
+
+  categoryMenu(): Observable<Category[]> {
+    const getCategorysUrl = this.apiConfig.getEndpoint('getCategorys');
+    return this.http.get<Category[]>(`${getCategorysUrl}`, { headers: this.jsonHeaders });
+  }
+
+
+  getMenuItems(restaurantId: string, page: number, size: number): Observable<any> {
+    const getMenuItemsUrl = this.apiConfig.getEndpoint('getMenuItems');
+    const url = `${getMenuItemsUrl}${restaurantId}?size=${size}&page=${page}`;
+    return this.http.get<any>(url);
+  }
+
+  searchMenuItems(restaurantId: string, page: number, size: number, keyword: string = ''): Observable<any> {
+    const searchMenuItemsUrl = this.apiConfig.getEndpoint('searchMenuItems');
+    const url = `${searchMenuItemsUrl}${restaurantId}?size=${size}&page=${page}&keyword=${encodeURIComponent(keyword)}`;
+    return this.http.get<any>(url);
+  }
+
+  createOrUpdateProduct(formData: FormData): Observable<any> {
+    const addUpdateItemUrl = this.apiConfig.getEndpoint('addUpdateItem');
+    return this.http.post(addUpdateItemUrl, formData);
+  }
+
+ deleteMenuItem(productId: number): Observable<any> {
+  const deleteItemUrl = this.apiConfig.getEndpoint('deleteItem');
+    return this.http.delete(`${deleteItemUrl}${productId}`);
+  }
+
+   toggleMenuItemAvailability(restaurantId: string, productId: any): Observable<any> {
+    const itemAvailabilityUrl = this.apiConfig.getEndpoint('itemAvailability');
+    const url = `${itemAvailabilityUrl}${productId}/toggle-availability`;
+    return this.http.patch(url, {}, {
+      headers: new HttpHeaders({
+        'Business-Id': restaurantId
+      })
+    });
+  }
+
+  getOrders(orderType: string, params: any): Observable<any> {
+    let queryParams = new HttpParams();
+
+    if (params.frequency && params.frequency !== 'NONE') {
+      queryParams = queryParams.set('frequency', params.frequency);
+    }
+    if (params.status) {
+      queryParams = queryParams.set('orderStatus', params.status); // Use 'status' for dine-in API
+    }
+    queryParams = queryParams.set('businessId', params.businessId);
+    if (params.fromDate) {
+      queryParams = queryParams.set('fromDate', params.fromDate);
+    }
+    if (params.toDate) {
+      queryParams = queryParams.set('toDate', params.toDate);
+    }
+    queryParams = queryParams.set('page', params.page);
+    queryParams = queryParams.set('size', params.size);
+    // if (params.orderType) {
+    //   queryParams = queryParams.set('orderType', params.orderType);
+    // }
+
+    const url = orderType === 'DINE_IN' 
+      ? this.apiConfig.getEndpoint('reportDinin') 
+      : this.apiConfig.getEndpoint('reportDelivery');
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.get<any>(url, { headers, params: queryParams });
+  }
+
+  downloadExcelReport(orderType: string, params: any): Observable<Blob> {
+    let queryParams = new HttpParams();
+
+    if (params.frequency && params.frequency !== 'NONE') {
+      queryParams = queryParams.set('frequency', params.frequency);
+    }
+    if (params.status) {
+      queryParams = queryParams.set('orderStatus', params.status); // Use 'status' for dine-in API
+    }
+    queryParams = queryParams.set('restaurantId', params.businessId);
+    queryParams = queryParams.set('fromDate', params.fromDate);
+    queryParams = queryParams.set('toDate', params.toDate);
+    // if (params.orderType) {
+    //   queryParams = queryParams.set('orderType', params.orderType);
+    // }
+
+    const url = orderType === 'DINE_IN' 
+      ? this.apiConfig.getEndpoint('reportDininExcel') 
+      : this.apiConfig.getEndpoint('reportDeliveryExcel');
+    return this.http.get(url, { responseType: 'blob', params: queryParams });
+  }
+
+  getProductReports(params: any): Observable<any> {
+    const getProductReportsUrl = this.apiConfig.getEndpoint('getProductReports');
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      // Include all parameters, even if empty
+      httpParams = httpParams.set(key, params[key] != null ? params[key].toString() : '');
+    });
+    return this.http.get(`${ getProductReportsUrl }`, { params: httpParams });
+  }
+
+   downloadProductReportsExcel(params: any): Observable<Blob> {
+    const downloadProductReportsExcelUrl = this.apiConfig.getEndpoint('downloadProductReportsExcel');
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      httpParams = httpParams.set(key, params[key] != null ? params[key].toString() : '');
+    });
+    return this.http.get(`${downloadProductReportsExcelUrl}`, {
+      params: httpParams,
+      responseType: 'blob'
+    });
+  }
+
+  getCaptains(): Observable<any[]> {
+    const getAllCaptainsUrl = this.apiConfig.getEndpoint('getAllCaptains');
+    return this.http.get<any[]>(getAllCaptainsUrl);
+  }
+
+  private captainListUpdate = new Subject<void>();
+
+   onboardCaptain(payload: any): Observable<number> {
+    const addCaptainsUrl = this.apiConfig.getEndpoint('addCaptains');
+    return this.http.post<number>(addCaptainsUrl, payload);
+  }
+
+  addPermissions(userId: number, permissions: string[]): Observable<void> {
+    const addPermissionsUrl = this.apiConfig.getEndpoint('addPermissions');
+    return this.http.post<void>(`${addPermissionsUrl}?userId=${userId}`, permissions);
+  }
+
+  removePermissions(userId: number, permissions: string[]): Observable<void> {
+    const removePermissionsUrl = this.apiConfig.getEndpoint('removePermissions');
+    return this.http.delete<void>(`${removePermissionsUrl}?userId=${userId}`, { body: permissions });
+  }
+
+  notifyCaptainListUpdate(): void {
+    this.captainListUpdate.next();
+  }
+
+  getCaptainListUpdate(): Observable<void> {
+    return this.captainListUpdate.asObservable();
+  }
+}

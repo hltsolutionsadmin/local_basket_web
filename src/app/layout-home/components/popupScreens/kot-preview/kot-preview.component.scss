@@ -1,0 +1,30 @@
+.kot-preview-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 300px;
+}
+
+@media print {
+  .kot-preview-container {
+    margin: 0 auto;
+    padding: 10mm;
+    font-size: 12pt;
+    width: 80mm; /* Typical thermal printer width */
+    border: none;
+    box-shadow: none;
+  }
+  button {
+    display: none;
+  }
+  h2, h3, p, ul {
+    margin: 0;
+    padding: 2mm;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  li {
+    margin-bottom: 2mm;
+  }
+}

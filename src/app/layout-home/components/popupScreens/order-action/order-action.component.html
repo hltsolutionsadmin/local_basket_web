@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ data.action | titlecase }} Order #{{ data.order.orderNumber }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="actionForm">
+    <ng-container *ngIf="data.action === 'approve'">
+    <input type="time" class="form-control" formControlName="notes" required />
+    </ng-container>
+    <ng-container *ngIf="data.action === 'reject'">
+      <lib-hlt-text-area
+        label="Notes"
+        [required]="true"
+        (TextAreaValue)="updateNotes($event)">
+      </lib-hlt-text-area>
+  
+    <lib-hlt-text-input
+      label="Updated By"
+      [required]="true"
+      (textValue)="updateUpdatedBy($event)">
+    </lib-hlt-text-input>
+      </ng-container>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button
+    [color]="data.action === 'approve' ? 'primary' : 'warn'"
+    [disabled]="!actionForm.valid"
+    (click)="onConfirm()">
+    Confirm
+  </button>
+</mat-dialog-actions>

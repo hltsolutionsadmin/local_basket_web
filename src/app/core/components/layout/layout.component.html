@@ -1,0 +1,92 @@
+<div class="layoutMain">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="app-name">
+        <img src="assets/images/localbasketlogo.png" width="30px" height="30px" alt="logo" style="border-radius: 15%;">
+        Local Basket
+      </div>
+      <div class="restaurant-info" (click)="toggleDropdown()"
+        style="cursor: pointer; position: relative; z-index: 3000;">
+          <mat-icon [matBadge]="totalElements" matBadgePosition="after"  style="margin-right: 1.3rem; cursor: pointer;"
+          (click)="openNotifications(); $event.stopPropagation()">notifications</mat-icon>
+                <mat-icon>person_pin_circle</mat-icon>
+                <span>{{ restaurantName }}</span>
+                <span class="status-dot" [ngClass]="{'online': isOnline}"></span>
+                <mat-icon class="arrow-icon">{{ isDropdownOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+        </mat-icon>
+            <!-- Dropdown -->
+                <div class="dropdown-menus" *ngIf="isDropdownOpen" (click)="$event.stopPropagation()">
+                    <div class="dropdown-item">
+                        <mat-slide-toggle name="onlineStatus" [(ngModel)]="isOnline"
+              (change)="toggleOnline($event.checked)">
+                            <span class="toggle-label">{{ isOnline ? 'Online' : 'Offline' }}</span>
+                          </mat-slide-toggle>
+                      </div>
+                    <div class="dropdown-item">
+                        <mat-slide-toggle name="sellsCakes" [(ngModel)]="sellsCakes">
+                           <span class="toggle-label">Sells Cakes</span>
+                          </mat-slide-toggle>
+                      </div>
+                    <div class="dropdown-item">
+                        <mat-slide-toggle name="specialOrders" [(ngModel)]="specialOrders">
+                            <span class="toggle-label">Special Orders</span>
+                          </mat-slide-toggle>
+                      </div>
+                  </div>
+              </div>
+    </div>
+  </nav>
+  <div class="layout-container" [ngClass]="{'panel-open': isPanelOpen}">
+    <div class="card">
+      <div class="sideNav-header d-flex justify-content-start p-1 m-3 gap-3 align-items-center">
+        <div class="restaurant-logo">
+          <mat-icon class="restaurantIcon">restaurant</mat-icon>
+        </div>
+        <div class="restaurantName">
+          <p>{{ restaurantName }}</p>
+        </div>
+      </div>
+      <ul class="list">
+        <li class="element" routerLink="/layoutHome/layout/delivery" routerLinkActive="active">
+          <mat-icon>restaurant_menu</mat-icon>
+          <p class="label">Online Orders</p>
+        </li>
+        <li class="element" routerLink="/menuManagement/menuManagement" routerLinkActive="active">
+          <mat-icon>restaurant_menu</mat-icon>
+          <p class="label">Menu Items</p>
+        </li>
+        <li class="element" routerLink="/menuManagement/itemAvailability" routerLinkActive="active">
+          <mat-icon>restaurant</mat-icon>
+          <p class="label">Menu Status</p>
+        </li>
+        <li class="element" (click)="toggleReportsSubMenu()">
+          <mat-icon>report</mat-icon>
+          <p class="label">Reports</p>
+          <mat-icon class="arrow-icon">{{ isReportsSubMenuOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+            }}</mat-icon>
+        </li>
+        <ul class="sub-list" *ngIf="isReportsSubMenuOpen">
+          <li class="element sub-element" routerLink="/menuManagement/reports" routerLinkActive="active">
+            <p class="label">Order Reports</p>
+          </li>
+          <li class="element sub-element" routerLink="/menuManagement/product-reports" routerLinkActive="active">
+            <p class="label">Product Reports</p>
+          </li>
+        </ul>
+        <!-- <li class="element sub-element" routerLink="/menuManagement/captain" routerLinkActive="active">
+            <mat-icon class="mat-18">room_service</mat-icon>
+            <p class="label">Add Captain</p>
+          </li> -->
+        <li class="element" (click)="logOut()">
+          <mat-icon>exit_to_app</mat-icon>
+          <p class="label">LogOut</p>
+        </li>
+      </ul>
+    </div>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+      <app-notifications #notificationPanel (panelToggled)="onPanelToggled($event)" [isOpen]="isPanelOpen"
+        (closePanel)="closePanel()"></app-notifications>
+    </div>
+  </div>
+</div>

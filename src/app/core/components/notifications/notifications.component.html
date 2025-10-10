@@ -1,0 +1,45 @@
+<div class="notification-panel" [@panelState]="isOpen ? 'open' : 'closed'">
+  <div class="panel-header">
+    <mat-icon>notifications_active</mat-icon>
+    <mat-icon class="close-icon" (click)="closePanel.emit()">close</mat-icon>
+  </div>
+  <div class="panel-content">
+    <ng-container *ngIf="orders.length; else noOrders">
+      <div
+        *ngFor="let order of orders; let i = index"
+        class="order-card"
+        [ngClass]="{ 'card-new': order.orderStatus === 'PLACED', 'card-urgent': order.orderStatus === 'PREPARING' && order.timmimgs === 'COMPLETED' }"
+      >
+        <div class="order-header">
+          <span class="order-number">Order #{{ order.orderNumber.slice(-4) }}</span>
+          <span class="status-badge" *ngIf="order.orderStatus === 'PLACED'">New</span>
+          <span class="status-badge urgent" *ngIf="order.orderStatus === 'PREPARING' && order.timmimgs === 'COMPLETED'">Ready</span>
+        </div>
+        <div class="order-details mb-2">
+          <p class="order-number" *ngIf="order.orderStatus === 'PREPARING' && order.timmimgs === 'COMPLETED'">Preparation Time Completed</p>
+          <p>Customer: {{ order.username }}</p>
+          <p>Items: {{ getOrderItems(order) }}</p>
+          <p>Total: ${{ order.totalAmount }}</p>
+          <p>Time: {{ formatUpdatedDate(order.updatedDate) }}</p>
+        </div>
+        <div class="order-actions">
+          <ng-container *ngIf="order.orderStatus === 'PLACED'">
+            <button type="button" class="btn btn-outline-success btn-sm" (click)="handleAcceptClick(order)" [disabled]="isLoading">Accept</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="rejectOrder(order, '', '')">Decline</button>
+          </ng-container>
+          <ng-container *ngIf="order.orderStatus === 'PREPARING' && order.timmimgs === 'COMPLETED'">
+            <button type="button" class="btn btn-success btn-sm" (click)="markAsReadyForPickup(order)" [disabled]="isLoading">Ready for Pickup</button>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #noOrders>
+      <p class="no-orders-message">No new orders</p>
+    </ng-template>
+    <ng-container *ngIf="isLoading">
+      <div class="loader-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    </ng-container>
+  </div>
+</div>

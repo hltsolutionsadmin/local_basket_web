@@ -1,0 +1,84 @@
+<div class="panel-header d-flex justify-content-between align-items-center">
+  <h2 class="m-0">{{ data ? 'Edit Item' : 'New Item' }}</h2>
+  <button class="close-button" (click)="onCancel()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="panel-content">
+  <div class="item-details-header">
+    <div class="item-code-status w-100 mb-3 d-flex justify-content-between">
+      <span class="item-code">{{ data ? data.itemCode : 'New' }}</span>
+      <span class="item-status" [ngClass]="{'active': menuForm.get('ItemStatusActive')?.value, 'out-of-stock': !menuForm.get('ItemStatusActive')?.value}">
+        {{ menuForm.get('ItemStatusActive')?.value ? 'Active' : 'Out of Stock' }}
+      </span>
+    </div>
+    <div class="image-preview" (click)="triggerFileInput()">
+      <img [src]="existingImageUrl" alt="Item Preview" class="preview-image" *ngIf="existingImageUrl; else noImage">
+      <ng-template #noImage>
+        <div class="no-image-icon"><mat-icon>add_photo_alternate</mat-icon></div>
+      </ng-template>
+      <input type="file" #fileInput id="formFileMultiple" (change)="onFileChange($event)" accept="image/*" style="display: none;">
+    </div>
+  </div>
+
+  <form [formGroup]="menuForm" (ngSubmit)="$event.preventDefault(); onSubmit()" (keydown.enter)="suppressEnter($event)" autocomplete="off">
+    <div class="form-group">
+      <label for="itemName">Name</label>
+      <input id="itemName" type="text" class="mb-3" formControlName="ItemName" (keydown.enter)="onEnterKey($event, itemCode)">
+
+      <label for="itemName">Item Code</label>
+      <input id="itemName" type="text" class="mb-3" formControlName="ItemCode" #itemCode (keydown.enter)="onEnterKey($event, descriptionInput)">
+
+      <label for="description">Description</label>
+      <textarea id="description" class="mb-3" formControlName="Description" placeholder="Description" #descriptionInput (keydown.enter)="onEnterKey($event, categorySelect)"></textarea>
+
+      <label for="category">Category</label>
+      <select id="category" class="mb-3" formControlName="Category" #categorySelect (keydown.enter)="onEnterKey($event, orderTypeSelect)">
+        <option value="">None</option>
+        @for (cat of categories; track cat) {
+          <option [value]="cat.name">{{ cat.name }}</option>
+        }
+        <option value="Add New Category">Add New Category</option>
+      </select>
+
+      <label for="orderType">Order Type</label>
+      <select id="orderType" class="mb-3" formControlName="OrderType" #orderTypeSelect (keydown.enter)="onEnterKey($event, typeSelect)">
+        <option value="">None</option>
+        @for (orderType of orderTypes; track orderType) {
+          <option [value]="orderType.value">{{ orderType.display }}</option>
+        }
+      </select>
+
+      <label for="type">Type</label>
+      <select id="type" class="mb-3" formControlName="Type" #typeSelect (keydown.enter)="onEnterKey($event, onlinePriceInput)">
+        <option value="">None</option>
+        @for (type of types; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
+      </select>
+
+      <label for="price">Price</label>
+      <input id="price" type="number" class="mb-3" (wheel)="onWheel($event)" formControlName="ItemPrice" #priceInput
+             [disabled]="!menuForm.get('ItemPrice')?.enabled" (keydown.enter)="onEnterKey($event, onlinePriceInput)">
+
+      <label for="onlinePrice">Online Price</label>
+      <input id="onlinePrice" class="mb-3" type="number" (wheel)="onWheel($event)" formControlName="OnlinePrice" #onlinePriceInput
+             [disabled]="!menuForm.get('OnlinePrice')?.enabled" (keydown.enter)="onEnterKey($event, takeAwayPriceInput)">
+
+      <label for="takeAwayPrice">TakeAway Price</label>
+      <input id="takeAwayPrice" class="mb-3" type="number" (wheel)="onWheel($event)" formControlName="TakeAwayPrice" #takeAwayPriceInput
+             [disabled]="!menuForm.get('TakeAwayPrice')?.enabled" (input)="onTakeAwayPriceInput()" (keydown.enter)="onEnterKey($event, ignoreTaxInput)">
+
+      <div class="checkbox-group">
+        <label><input type="checkbox" formControlName="IgnoreTax" #ignoreTaxInput> Ignore Tax</label>
+        <label><input type="checkbox" formControlName="IgnoreDiscount"> Ignore Discount</label>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="panel-actions d-flex justify-content-evenly">
+  <button type="button" class="cancel-btn" (click)="onCancel()">Cancel</button>
+  <button type="submit" class="save-btn" [disabled]="menuForm.invalid" (click)="onSubmit()">Save</button>
+</div>

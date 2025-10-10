@@ -1,0 +1,25 @@
+
+<div class="dialog-header d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>Add Category</h2>
+</div>
+<mat-dialog-content>
+  <form [formGroup]="addCategoryForm" autocomplete="off">
+    <mat-form-field class="w-100">
+      <mat-label>Item Name</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="addCategoryForm.get('name')?.hasError('required')">
+        Category name is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="image-preview mb-3">
+      <label class="form-label">Item Image</label>
+      <input class="form-control" type="file" id="formFileMultiple" (change)="onFileChange($event)" accept="image/*">
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()">Cancel</button>
+  <button mat-flat-button type="button" color="primary" (click)="onSave()" [disabled]="addCategoryForm.invalid">Save</button>
+</mat-dialog-actions>

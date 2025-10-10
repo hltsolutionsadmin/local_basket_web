@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Select Printer</h2>
+    <mat-dialog-content>
+      <p>No default printer found. Please select a printer:</p>
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Available Printers</mat-label>
+        <mat-select [(ngModel)]="selectedPrinter">
+          <mat-option *ngFor="let printer of data.printers" [value]="printer.name">
+            {{ printer.name }} {{ printer.isDefault ? '(Default)' : '' }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="onSelect()" [disabled]="!selectedPrinter">Print</button>
+    </mat-dialog-actions>

@@ -1,0 +1,122 @@
+<div class="reports-page-container">
+  <div class="filter-section card p-3">
+    <form (ngSubmit)="onSearch()" class="d-flex align-items-end flex-wrap gap-3">
+      <div class="form-group flex-fill">
+        <label for="periodType" class="form-label">Select Period</label>
+        <div class="position-relative d-inline-block w-100">
+          <select id="periodType" [(ngModel)]="periodType" name="periodType" (change)="updateDateRange()"
+            class="form-select custom-select-control">
+            <option value="NONE">None</option>
+            <option value="MONTHLY">MONTHLY</option>
+            <option value="ANNUALLY">ANNUALLY</option>
+            <option value="DAILY">DAILY</option>
+            <option value="QUARTERLY">QUARTERLY</option>
+          </select>
+          <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="fromDate" class="form-label">Date Range</label>
+        <div class="position-relative d-inline-block w-100">
+          <input type="date" id="fromDate" [(ngModel)]="fromDate" name="fromDate" required
+            class="form-control custom-date-control">
+          <mat-icon class="calendar-icon">calendar_month</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="toDate" class="form-label invisible-label">To Date</label>
+        <div class="position-relative d-inline-block w-100">
+          <input type="date" id="toDate" [(ngModel)]="toDate" name="toDate" required
+            class="form-control custom-date-control">
+          <mat-icon class="calendar-icon">calendar_month</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="orderType" class="form-label">Order Type</label>
+        <div class="position-relative d-inline-block w-100">
+          <select id="orderType" [(ngModel)]="orderType" name="orderType" (change)="onOrderTypeChange()"
+            class="form-select custom-select-control">
+            <option value="DINE_IN">Dine-in</option>
+            <option value="TAKEAWAY">Takeaway</option>
+            <option value="DELIVERY">Delivery</option>
+          </select>
+          <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn search-button" [disabled]="!canSearch()">
+          <mat-icon class="button-icon">search</mat-icon>
+        </button>
+        <button type="button" class="btn download-button" (click)="downloadExcel()"
+          [disabled]="!fromDate || !toDate || isDownloading">
+          <mat-icon class="button-icon">download</mat-icon> {{ isDownloading ? '...' : 'Excel' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-section card">
+    <div class="table-responsive">
+      <table class="table custom-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">PRODUCT NAME</th>
+            <th scope="col">QUANTITY</th>
+            <th scope="col">CATEGORY NAME</th>
+            <th scope="col">GROSS SALES</th>
+            <th scope="col">TOTAL</th>
+            <th scope="col">AVERAGE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td [attr.colspan]="5" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Loading Products...</p>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && products.length === 0">
+            <td [attr.colspan]="5" class="text-center py-4">
+              No products found for the selected criteria.
+            </td>
+          </tr>
+          <tr *ngFor="let product of products" class="table-row">
+            <td>{{ product.productName }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.categoryName }}</td>
+            <td>{{ product.grossSales }}</td>
+            <td>{{ product.total }}</td>
+            <td>{{ product.avg }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="totalItems > 0" class="pagination-container">
+      <span class="pagination-info">Showing {{ (currentPage * pageSize) + 1 }} to {{ (currentPage + 1) * pageSize > totalItems ? totalItems : (currentPage + 1) * pageSize }} of {{ totalItems }} results</span>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" (click)="onPageChange(0)" aria-label="First">«</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" (click)="onPageChange(currentPage - 1)" aria-label="Previous">‹</a>
+        </li>
+        <li class="page-item" *ngFor="let pageNum of getPagesArray()" [class.active]="pageNum === currentPage">
+          <a class="page-link" (click)="onPageChange(pageNum)">{{ pageNum + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= (totalPages - 1)">
+          <a class="page-link" (click)="onPageChange(currentPage + 1)" aria-label="Next">›</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= (totalPages - 1)">
+          <a class="page-link" (click)="onPageChange(totalPages - 1)" aria-label="Last">»</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

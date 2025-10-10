@@ -1,0 +1,46 @@
+<div class="kot-container">
+  <div class="navigation" *ngIf="!isSingleKot">
+    <button mat-icon-button [disabled]="!canGoPrev" (click)="navigate('prev')" class="nav-arrow left-arrow">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="!canGoNext" (click)="navigate('next')" class="nav-arrow right-arrow">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+  <div>
+    <div class="kot-header">
+      <h2>KOT</h2>
+      <p>{{ todayDateTime | date:'MMM d, h:mm:ss a' }}</p>
+      <p>Table {{ data.tableId }}</p>
+      <p>Current KOT NO: {{ kotSlips[currentIndex].kotNumber }}</p>
+      <p>Recent KOT NO: {{ data.kotHistoryNumbers.length > 0 ? data.kotHistoryNumbers[0] : 'None' }}</p>
+      <p>Status: {{ data.status === 'RUNNING' ? 'RUNNING' : 'New Order' }}</p>
+    </div>
+    <div class="kot-divider">--------------------------------</div>
+    <div class="kot-items">
+      <table class="kot-table">
+        <thead>
+          <tr>
+            <th class="sno-col">S.No</th>
+            <th class="item-col">Item Name</th>
+            <th class="qty-col">Qty</th>
+            <th class="desc-col">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of kotSlips[currentIndex].items; let i = index">
+            <td class="sno-col">{{ i + 1 }}</td>
+            <td class="item-col">{{ item.productName }}</td>
+            <td class="qty-col">{{ item.quantity }}</td>
+            <td class="desc-col">{{ item.description || '' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="kot-divider">--------------------------------</div>
+  </div>
+  <mat-dialog-actions align="end">
+    <button mat-button color="primary" (click)="onPrintKot()">Print KOT</button>
+    <button mat-button (click)="onClose()">Cancel</button>
+  </mat-dialog-actions>
+</div>

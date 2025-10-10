@@ -1,0 +1,114 @@
+<div class="register-main">
+  <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-inner">
+      <div class="carousel-item active" style="background-color: #f7c64f; height: 90%;">
+        <div class="d-block about">
+          <div class="content mb-4">
+            <h2>With Local Basket, you can actually organize your business.</h2>
+          </div>
+          <div class="profile">
+            <div class="profileInfo">
+              <h5 class="m-0">Hlt Solutions</h5>
+              <p class="m-0">Director, Local Basket</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item" style="background-color: #1f1f1f; height: 90%;">
+        <div class="d-flex">
+          <div class="left-content">
+            <h2 class="text-light"><span>More than 75%</span> of our customers have lasting impacts*</h2>
+            <div class="line"></div>
+          </div>
+          <div class="right-content">
+            <ul class="text-light">
+              <li class="highlightOne"><span>1-3 hrs per day</span> saved in order processing time</li>
+              <li class="highlightOne"><span>20-30%</span> reduction in inventory costs</li>
+              <li class="highlightOne"><span>30-50%</span> of manual tasks automated</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item" style="background-color: #ffe5df; height: 90%;">
+        <div class="d-flex">
+          <div class="left-content">
+            <h2 class="highlights">Join thousands of customers preferring Eato</h2>
+          </div>
+          <div class="right-content">
+            <ul class="text-light">
+              <li class="highlightTwo mb-3">Track inventory</li>
+              <li class="highlightTwo mb-3">Streamline sales</li>
+              <li class="highlightTwo mb-3">Oversee locations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#carouselExampleSlidesOnly" data-bs-slide-to="2"></button>
+      </div>
+    </div>
+  </div>
+  <div class="otp-section">
+    <div class="otp-section-main">
+      <div class="para mb-3">
+        <lib-hlt-heading-link
+          *ngIf="!showOtpScreen"
+          headingText="LOGIN"
+          headingStyles="font-size: 34px;"
+        ></lib-hlt-heading-link>
+        <lib-hlt-heading-link
+          *ngIf="!showOtpScreen"
+          headingText="Please enter your phone number to get OTP"
+          headingStyles="color: #000; font-weight: 400;"
+        ></lib-hlt-heading-link>
+        <lib-hlt-heading-link
+          *ngIf="showOtpScreen"
+          headingText="Enter the 6-digit OTP to login"
+          headingStyles="color: #000; font-weight: 400;"
+        ></lib-hlt-heading-link>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="sendOtp()" *ngIf="!showOtpScreen" class="otp-password">
+        <div class="section">
+          <input type="number"  >
+          <lib-hlt-number-input
+            (mobileNumberChange)="onMobileNumberChange($event)"
+            label="Contact Number"
+          ></lib-hlt-number-input>
+        </div>
+        <lib-hlt-button
+          buttonName="Send OTP"
+          type="submit"
+          styles="background-color: black; color: white"
+          style="width: 100%;"
+          [disabled]="loginForm.invalid"
+        ></lib-hlt-button>
+        <div class="error" *ngIf="errorMessage && loginForm.touched">
+          <small>{{ errorMessage }}</small>
+        </div>
+      </form>
+
+      <form (ngSubmit)="verifyOtp()" *ngIf="showOtpScreen" class="otp-password">
+        <lib-hlt-otp [otp]="otp" (otpChange)="onOtpChange($event)"></lib-hlt-otp>
+        <p>{{ otpLogin }}</p>
+        <div class="error" *ngIf="errorMessage">
+          <small>{{ errorMessage }}</small>
+        </div>
+        <lib-hlt-button
+          buttonName="Verify & Login"
+          type="submit"
+          [disabled]="otp.join('').length !== 6"
+        ></lib-hlt-button>
+        <div class="toggle-link" style="text-align: center; margin-top: 1rem;">
+          <lib-hlt-heading-link
+            linkText="Change Number"
+            linkStyles="cursor: pointer;"
+            (linkClick)="changeNumber()"
+          ></lib-hlt-heading-link>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

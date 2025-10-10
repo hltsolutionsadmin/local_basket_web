@@ -1,0 +1,11 @@
+<div class="approval-container">
+  <ng-container *ngIf="reason === 'not-approved'; else disabledBlock">
+    <h2>Your restaurant approval is pending!</h2>
+    <p>Please contact support for more information.</p>
+  </ng-container>
+
+  <ng-template #disabledBlock>
+    <h2>Your restaurant has been disabled by admin!</h2>
+    <p>Please contact support to resolve the issue.</p>
+  </ng-template>
+</div>

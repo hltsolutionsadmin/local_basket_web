@@ -1,0 +1,107 @@
+.kot-container {
+  font-family: 'Courier New', monospace;
+  width: 300px;
+  margin: 0 auto;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  background: #fff;
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+.navigation {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav-arrow {
+  z-index: 10;
+}
+
+.left-arrow {
+  position: absolute;
+  left: -30%;
+}
+
+.right-arrow {
+  position: absolute;
+  right: -20%;
+}
+
+.kot-header, .bill-header {
+  text-align: center;
+}
+
+.kot-divider {
+  text-align: center;
+  margin: 5px 0;
+}
+
+.kot-items {
+  margin: 10px 0;
+}
+
+.kot-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.kot-table th, .kot-table td {
+  padding: 2px;
+  text-align: left;
+}
+
+.kot-table th {
+  font-weight: bold;
+}
+
+.sno-col {
+  width: 10%;
+  text-align: center;
+}
+
+.item-col {
+  width: 40%; // Adjusted for dine-in
+}
+
+.qty-col {
+  width: 15%;
+  text-align: center;
+}
+
+.desc-col {
+  width: 35%;
+  font-style: italic;
+}
+
+.bill-header {
+  .item-col {
+    width: 50%; // Adjusted for delivery
+  }
+  .qty-col {
+    width: 20%;
+  }
+  .desc-col {
+    width: 20%;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+@media print {
+  .kot-container {
+    width: 80mm;
+  }
+  .actions {
+    display: none; // Hide buttons when printing
+  }
+}

@@ -1,0 +1,231 @@
+.layoutMain {
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+   position: relative;
+  overflow: visible;
+}
+
+.navbar {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+  height: 50px;
+  z-index: 2000;
+  position: relative;
+  overflow: visible !important;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.app-name {
+ font-size: 1.5rem;
+    color: #000;
+    padding-inline: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+}
+
+.restaurant-info {
+  font-size: 1rem;
+  color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+  z-index: 3000;
+}
+
+.dropdown-menus {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  padding: 12px;
+  z-index: 5000;
+  min-width: 220px;
+  border: 1px solid #e0e0e0;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item mat-slide-toggle {
+  width: 100%;
+}
+
+.toggle-label {
+  margin-left: 8px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-left: 8px;
+  display: inline-block;
+}
+
+.status-dot.online {
+  background-color: #00ff00;
+}
+
+.layout-container {
+  display: flex;
+  transition: all 0.4s ease-in-out;
+  overflow: hidden;
+  height: 92%;
+}
+
+
+.main-content {
+  flex-grow: 1;
+  transition: margin-right 0.4s ease-in-out;
+  height: 100%; 
+  // overflow-y: auto;
+}
+
+.layout-container.panel-open .main-content {
+  margin-right: 300px;
+}
+
+.sideNav-header {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.restaurant-logo {
+  border-radius: 50%;
+  background: rgba(31, 41, 55, 1);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.restaurantIcon {
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(249, 250, 251, 1);
+}
+
+.card {
+  width: 200px;
+  background-color: rgba(249, 250, 251, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  // padding: 1rem 0rem;
+  border-radius: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.card .list {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0px 10px;
+  overflow-y: auto;
+}
+
+.card .list .element {
+  display: flex;
+  align-items: center;
+  color: rgba(75, 85, 99, 1);
+  gap: 10px;
+  transition: all 0.3s ease-out;
+  padding: 4px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.card .list .element svg {
+  width: 19px;
+  height: 19px;
+  transition: all 0.3s ease-out;
+}
+
+.card .list .element .label {
+  font-weight: 600;
+}
+
+.card .list .element:hover,
+.card .list .element.active {
+  background-color: rgba(56, 45, 71, 0.836);
+  color: #ffffff;
+  transform: translate(1px, -1px);
+}
+
+.card .list .element:hover svg,
+.card .list .element.active svg {
+  stroke: #ffffff;
+}
+
+.card .list .element:active {
+  transform: scale(0.99);
+}
+
+.card .list:last-child .element:hover,
+.card .list:last-child .element.active {
+  background-color: rgba(56, 45, 71, 0.836);
+}
+
+.card .list:last-child .element.delete:hover,
+.card .list:last-child .element.delete.active {
+  background-color: #8e2a2a;
+}
+
+.sub-list {
+  list-style: none;
+  padding-left: 20px; 
+}
+
+.sub-element {
+  padding-left: 10px; 
+  font-size: 0.9em; 
+}
+
+.arrow-icon {
+  margin-left: auto; 
+}
+
+::ng-deep .mat-badge-content{
+    height: 10px;
+    width: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
