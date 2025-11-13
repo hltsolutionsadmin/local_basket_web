@@ -1,5 +1,6 @@
 {
-  "name": "local-basket",
+  "name": "localbasket",
+  "productName": "local basket",
   "version": "1.0.0",
   "description": "LocalBasket restaurant management app",
   "main": "app.js",
@@ -34,6 +35,7 @@
     "@angular/ssr": "^19.2.6",
     "@cuj1559/electron-push-receiver": "^3.1.8",
     "bootstrap": "^5.3.5",
+    "canvas": "^3.2.0",
     "date-fns": "^4.1.0",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.1",
@@ -41,6 +43,7 @@
     "express": "^4.18.2",
     "firebase": "^11.0.1",
     "hlt-reusable-lib": "^0.0.20",
+    "html-to-image": "^1.11.13",
     "node-geocoder": "^4.4.1",
     "node-printer": "^1.0.4",
     "node-thermal-printer": "^4.5.0",
@@ -83,8 +86,8 @@
     "typescript": "~5.7.2"
   },
   "build": {
-    "appId": "com.eato.app",
-    "productName": "local-basket",
+    "appId": "com.localbasket.app",
+    "productName": "local basket",
     "directories": {
       "output": "release"
     },

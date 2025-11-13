@@ -75,4 +75,7 @@ export class HltTableComponent implements AfterViewInit , OnChanges{
   onPageChange(event: PageEvent) {
     this.page.emit(event.pageIndex);
   }
+  trackByItemId(index: number, item: any): any {
+  return item.id;
+}
 }

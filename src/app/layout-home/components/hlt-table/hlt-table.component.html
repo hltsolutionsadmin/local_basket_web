@@ -52,7 +52,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns" class="fixed-header-row"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-row"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackByItemId" class="hover-row"></tr>
     </table>
   </div>
   <div *ngIf="usePagination" class="paginator-container">

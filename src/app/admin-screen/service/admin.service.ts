@@ -76,23 +76,23 @@ export class AdminService {
  
 
   getUnapprovedBusinesses(page: number, size: number): Observable<PaginatedResponse<Business>> {
-     const getUnapprovedBusinessesUrl = this.apiConfig.getEndpoint('getUnapprovedBusinesses');
-    return this.http.get<PaginatedResponse<Business>>(getUnapprovedBusinessesUrl);
+     const getUnapprovedBusinessesUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    return this.http.get<PaginatedResponse<Business>>(`${getUnapprovedBusinessesUrl}/byCategory?categoryName=Restaurant&approved=false&page=${page}&size=${size}`);
   }
 
    getapprovedBusinesses(page: number, size: number): Observable<PaginatedResponse<Business>> {
-     const getapprovedBusinessesUrl = this.apiConfig.getEndpoint('getapprovedBusinesses');
-    return this.http.get<PaginatedResponse<Business>>(getapprovedBusinessesUrl);
+     const getapprovedBusinessesUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    return this.http.get<PaginatedResponse<Business>>(`${getapprovedBusinessesUrl}/byCategory?categoryName=Restaurant&approved=true&page=${page}&size=${size}`);
   }
 
    approveBusiness(businessId: number): Observable<any> {
-     const approveBusinessUrl = this.apiConfig.getEndpoint('approveBusiness');
-    return this.http.put(`${approveBusinessUrl}${businessId}`, {});
+     const approveBusinessUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    return this.http.put(`${approveBusinessUrl}/approve/${businessId}`, {});
   }
 
    updateBusinessStatus(businessId: number, enabled: boolean): Observable<any> {
-     const updateBusinessStatusUrl = this.apiConfig.getEndpoint('updateBusinessStatus');
-    return this.http.put(`${updateBusinessStatusUrl}${businessId}/status?enabled=${enabled}`, {}, { responseType: 'text' });
+     const updateBusinessStatusUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    return this.http.put(`${updateBusinessStatusUrl}/${businessId}/status?enabled=${enabled}`, {}, { responseType: 'text' });
   }
 
    getCategories(): Observable<Category[]> {

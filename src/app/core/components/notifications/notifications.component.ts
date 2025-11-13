@@ -9,9 +9,8 @@ import { OrderActionComponent } from '../../../layout-home/components/popupScree
 import { MatDialog } from '@angular/material/dialog';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { enIN } from 'date-fns/locale'; 
-import { PrintService } from '../../../layout-home/service/print.service';
 import { OrderOnline } from '../../../layout-home/models/interface.model';
-import { ApiConfigService } from '../../service/api-config.service';
+import { PoolingService } from '../../service/pooling.service';
 
 @Component({
   selector: 'app-notifications',
@@ -34,7 +33,7 @@ import { ApiConfigService } from '../../service/api-config.service';
   providers: [DatePipe]
 })
 export class NotificationsComponent implements OnInit {
-   orders: OrderOnline[] = [];
+  orders: OrderOnline[] = [];
   isLoading = false;
   @Input() isOpen = false;
   businessId: any;
@@ -50,8 +49,7 @@ export class NotificationsComponent implements OnInit {
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog,
     private readonly cdr: ChangeDetectorRef,
-    private readonly printService: PrintService,
-    private readonly pollingService: ApiConfigService // Inject PollingService
+    private readonly pollingService: PoolingService
   ) {}
 
   ngOnInit(): void {
@@ -144,33 +142,13 @@ export class NotificationsComponent implements OnInit {
           const minutes = preparationTime.split(':')[1];
           const formattedPreparationTime = minutes.padStart(2, '0');
 
-          return this.orderService.updateOrderStatus(order.orderNumber, 'PREPARING', formattedPreparationTime, '').pipe(
-            switchMap((approveResult) => {
-              if (!approveResult) {
-                this.snackBar.open('Failed to approve order', 'Close', { duration: 3000 });
-                return from([]);
-              }
-              return this.printService.printAndMarkKot({
-                orderType: 'delivery',
-                recentlyUpdatedItems: order.orderItems,
-                restaurantName: order.businessName,
-                orderNumber: order.orderNumber,
-                orderId: order.id,
-                status: 'New Order',
-              });
-            }),
-            takeUntil(this.destroy$)
-          );
+          return this.orderService.updateOrderStatus(order.orderNumber, 'PREPARING', formattedPreparationTime, '');
         }),
         takeUntil(this.destroy$)
       )
       .subscribe({
-        next: (printResult) => {
-          if (printResult?.success) {
-            this.snackBar.open('Order accepted successfully and print sent to kitchen', 'Close', { duration: 3000 });
-          } else {
-            this.snackBar.open(`Print failed: ${printResult?.error || 'Unknown error'}`, 'Close', { duration: 3000 });
-          }
+        next: () => {
+          this.snackBar.open('Order accepted successfully', 'Close', { duration: 3000 });
           this.removeOrderFromNotificationList(order.id);
         },
         error: (error: any) => {
@@ -180,7 +158,6 @@ export class NotificationsComponent implements OnInit {
       });
   }
 
-  // New method to handle "Ready for Pickup" button click
   markAsReadyForPickup(order: OrderOnline): void {
     this.isLoading = true;
     this.orderService.updateOrderStatus(order.orderNumber, 'READY_FOR_PICKUP', '0', '').pipe(takeUntil(this.destroy$))
@@ -228,15 +205,15 @@ export class NotificationsComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  viewDetails(orderId: number): void {
-    this.orders = this.orders.filter((o) => o.id !== orderId);
-    if (!this.orders.length) {
-      this.panelToggled.emit(false);
-    }
-    this.router.navigate(['/layoutHome/layout/delivery', orderId]);
-    this.closePanel.emit();
-    this.cdr.markForCheck();
-  }
+  // viewDetails(orderId: number): void {
+  //   this.orders = this.orders.filter((o) => o.id !== orderId);
+  //   if (!this.orders.length) {
+  //     this.panelToggled.emit(false);
+  //   }
+  //   this.router.navigate(['/layoutHome/layout/delivery', orderId]);
+  //   this.closePanel.emit();
+  //   this.cdr.markForCheck();
+  // }
 
   formatUpdatedDate(dateString: string): string {
     if (!dateString) return 'Unknown time';

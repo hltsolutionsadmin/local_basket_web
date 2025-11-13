@@ -5,6 +5,7 @@ import { AuthService } from './auth/service/auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiConfigService } from './core/service/api-config.service';
+import { PoolingService } from './core/service/pooling.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,7 @@ import { ApiConfigService } from './core/service/api-config.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-   fcmToken = '';
+  fcmToken = '';
   lastMessage: any;
   loading$!: Observable<boolean>;
   loadingService = inject(TokenService);
@@ -22,7 +23,7 @@ export class AppComponent implements OnInit {
   router = inject(Router);
   cdr = inject(ChangeDetectorRef);
   snackBar = inject(MatSnackBar);
-  apiCongig = inject(ApiConfigService)
+  apiCongig = inject(PoolingService)
 
   constructor() {
     this.loading$ = this.loadingService.loading$;

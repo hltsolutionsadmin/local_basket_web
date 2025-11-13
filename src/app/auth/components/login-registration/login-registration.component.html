@@ -72,7 +72,6 @@
 
       <form [formGroup]="loginForm" (ngSubmit)="sendOtp()" *ngIf="!showOtpScreen" class="otp-password">
         <div class="section">
-          <input type="number"  >
           <lib-hlt-number-input
             (mobileNumberChange)="onMobileNumberChange($event)"
             label="Contact Number"

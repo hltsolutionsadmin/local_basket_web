@@ -185,3 +185,24 @@ export interface BusinessResponse {
   attributes: Attribute[];
   status: string;
 }
+
+// user response interface
+export interface BusinessRole {
+  id: number;
+  name: string;
+}
+
+export interface BusinessAttribute {
+  id: number;
+  attributeName: string;
+  attributeValue: string;
+}
+
+export interface BusinessUser {
+  id: number;
+  businessName: string;
+  enabled: boolean;
+  approved: boolean;
+  roles: BusinessRole[];
+  attributes: BusinessAttribute[];
+}

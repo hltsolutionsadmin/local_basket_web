@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuManagementService } from '../../menuManagementService/menu-management.service';
+import { MenuManagementService } from '../../../menuManagementService/menu-management.service';
 
 @Component({
   selector: 'app-product-reports',

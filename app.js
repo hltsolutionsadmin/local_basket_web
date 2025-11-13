@@ -1,23 +1,9 @@
-const { app, BrowserWindow, ipcMain, session } = require('electron');
-const path = require('path');
-const { execSync } = require('child_process');
+// app.js
+const { app, BrowserWindow, ipcMain, session } = require("electron");
+const path = require("path");
+const fs = require("fs");
 
 let appWindow;
-
-// Helper: Get default printer name from Windows registry (fallback)
-function getWindowsDefaultPrinterName() {
-  try {
-    const result = execSync(
-      'reg query "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Windows" /v Device',
-      { encoding: 'utf8' }
-    );
-    const match = result.match(/Device\s+REG_SZ\s+([^,]+)/);
-    return match ? match[1].trim() : null;
-  } catch (err) {
-    console.error('[Main] Failed to read default printer from registry:', err);
-    return null;
-  }
-}
 
 function createWindow() {
   appWindow = new BrowserWindow({
@@ -25,136 +11,154 @@ function createWindow() {
     height: 800,
     title: "Local Basket",
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
       webSecurity: false,
-      allowServiceWorkers: true,
       sandbox: false,
     },
   });
 
-  const indexPath = path.join(__dirname, 'dist/eato/browser/index.html');
+  const indexPath = path.join(__dirname, "dist/eato/browser/index.html");
 
-  if (process.env.NODE_ENV === 'development') {
-    appWindow.loadURL('http://localhost:4200')
-      .then(() => console.log('[Main] Loaded dev server'))
-      .catch((err) => console.error('[Main] Error loading dev server:', err));
+  if (process.env.NODE_ENV === "development") {
+    appWindow
+      .loadURL("http://localhost:4200")
+      .then(() => console.log("[Main] Loaded dev server"))
+      .catch((err) => console.error("[Main] Error loading dev server:", err));
   } else {
-    appWindow.loadFile(indexPath)
-      .then(() => console.log('[Main] index.html loaded successfully'))
-      .catch((err) => console.error('[Main] Error loading index.html:', err));
+    appWindow
+      .loadFile(indexPath)
+      .then(() => console.log("[Main] index.html loaded successfully"))
+      .catch((err) => console.error("[Main] Error loading index.html:", err));
   }
 
-  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(true);
-  });
-
-  appWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
-    console.log('[Main] Failed to load:', errorDescription, 'Retrying...');
-    appWindow.loadFile(indexPath)
-      .then(() => console.log('[Main] Retried loading index.html successfully'))
-      .catch((err) => console.error('[Main] Retry failed:', err));
+  appWindow.webContents.on("did-fail-load", () => {
+    appWindow.loadFile(indexPath);
   });
 }
 
 app.whenReady().then(() => {
-  session.defaultSession.clearStorageData({ storages: ['permissions'] }).then(() => {
-    createWindow();
-  });
+  session.defaultSession
+    .clearStorageData({ storages: ["permissions"] })
+    .then(() => {
+      createWindow();
+    });
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
-// IPC: Get available printers
-ipcMain.handle('get-printers', async () => {
+ipcMain.handle("get-printers", async () => {
   try {
     const printers = await appWindow.webContents.getPrintersAsync();
-    console.log('[Main] Available printers:', printers);
+    console.log("[Main] Available printers:", printers);
     return printers;
   } catch (err) {
-    console.error('[Main] Error fetching printers:', err);
+    console.error("[Main] Error fetching printers:", err);
     return [];
   }
 });
 
-// IPC: Get default printer name
-ipcMain.handle('get-default-printer', async () => {
+// ✅ Silent print with image rasterization (works for POS58)
+ipcMain.handle("print", async (event, html, deviceName) => {
   try {
-    const printers = await appWindow.webContents.getPrintersAsync();
-    let defaultPrinter = printers.find(p => p.isDefault);
+    if (!deviceName) return { success: false, error: "No printer selected" };
 
-    // Fallback: Registry
-    if (!defaultPrinter) {
-      console.warn('[Main] No default printer marked by Electron — checking registry...');
-      const winDefaultName = getWindowsDefaultPrinterName();
-      if (winDefaultName) {
-        // Improved matching: trim and case-insensitive
-        defaultPrinter = printers.find(p => p.name.trim().toLowerCase() === winDefaultName.trim().toLowerCase());
-        if (defaultPrinter) {
-          console.log('[Main] Default printer resolved via registry:', defaultPrinter.name);
-        } else {
-          console.warn('[Main] Registry default printer not found in Electron list.');
-        }
-      }
-    }
+    console.log(`[Main] 🖨 Starting print job for: ${deviceName}`);
 
-    // Final fallback: Hardcoded
-    if (!defaultPrinter) {
-      const fallbackName = 'POS58 Printer(6)'; // Your known fallback
-      defaultPrinter = printers.find(p => p.name.trim().toLowerCase() === fallbackName.trim().toLowerCase());
-      if (defaultPrinter) {
-        console.log('[Main] Using fallback printer:', fallbackName);
-      }
-    }
+    const printableHtml = html?.trim()
+      ? html
+      : `
+        <div style="font-family: monospace; font-size: 14px; padding: 10px;">
+          <h2 style="text-align:center;">Local Basket</h2>
+          <p>------------------------------------</p>
+          <p><b>Order #1234</b></p>
+          <p>Item 1 .......... ₹50</p>
+          <p>Item 2 .......... ₹25</p>
+          <p>------------------------------------</p>
+          <p>Total ........... ₹75</p>
+          <p style="text-align:center;">Thank you!</p>
+        </div>
+      `;
 
-    return defaultPrinter ? defaultPrinter.name : null;
-  } catch (err) {
-    console.error('[Main] Error getting default printer:', err);
-    return null;
-  }
-});
+    // Create hidden print window
+    const printWin = new BrowserWindow({
+      width: 380,
+      height: 600,
+      show: true, // visible for rendering (POS printers need it)
+      webPreferences: { contextIsolation: true },
+    });
 
-// IPC: Print handler (now accepts HTML and optional deviceName)
-ipcMain.handle('print', async (event, html, deviceName) => {
-  try {
-    const printWin = new BrowserWindow({ show: false, webPreferences: { webSecurity: false } });
-    await printWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    const htmlPage = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <style>
+            body { font-family: monospace; margin: 0; padding: 10px; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>${printableHtml}</body>
+      </html>
+    `;
+
+    await printWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlPage)}`);
+
+    await new Promise((resolve) => {
+      printWin.webContents.once("did-finish-load", resolve);
+    });
+
+    console.log("[Main] Rendering print window to image...");
+
+    // ✅ Capture the HTML as an image (so printer gets raster data)
+    const image = await printWin.webContents.capturePage();
+    const imgPath = path.join(app.getPath("temp"), "receipt.png");
+    fs.writeFileSync(imgPath, image.toPNG());
+    console.log("[Main] Image saved to:", imgPath);
+
+    // Load that image for printing
+    const imageHtml = `
+      <html>
+        <body style="margin:0; padding:0;">
+          <img src="file://${imgPath}" style="width:100%;" />
+        </body>
+      </html>
+    `;
+    await printWin.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(imageHtml)}`);
+
+    await new Promise((resolve) => {
+      printWin.webContents.once("did-finish-load", resolve);
+    });
+
+    console.log(`[Main] Printing silently to ${deviceName}...`);
 
     return new Promise((resolve) => {
-      printWin.webContents.on('did-finish-load', () => {
-        const options = { silent: true };
-        if (deviceName) {
-          options.deviceName = deviceName;
-          console.log('[Main] Printing via specified device:', deviceName);
-        } else {
-          console.log('[Main] Printing via system default (no deviceName provided)');
-        }
-
-        printWin.webContents.print(options, (success, error) => {
-          printWin.destroy();
-          if (!success) {
-            console.error('[Main] Print failed:', error);
-            resolve({ success: false, error: error || 'Print failed' });
-          } else {
-            console.log('[Main] Print job sent successfully.');
+      printWin.webContents.print(
+        {
+          silent: true,
+          deviceName,
+          printBackground: true,
+          color: false,
+          margin: { marginType: "none" },
+        },
+        (success, reason) => {
+          if (success) {
+            console.log("[Main] ✅ Silent image print success");
+            setTimeout(() => printWin.close(), 1000);
             resolve({ success: true });
+          } else {
+            console.error("[Main] ❌ Print failed:", reason);
+            printWin.close();
+            resolve({ success: false, error: reason });
           }
-        });
-      });
-
-      // Timeout for load failure
-      setTimeout(() => {
-        if (!printWin.isDestroyed()) {
-          printWin.destroy();
-          resolve({ success: false, error: 'Print load timeout' });
         }
-      }, 10000);
+      );
     });
   } catch (err) {
-    console.error('[Main] Print error:', err);
+    console.error("[Main] Print error:", err);
     return { success: false, error: err.message };
   }
 });

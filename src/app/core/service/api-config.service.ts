@@ -38,74 +38,7 @@ export class ApiConfigService {
 
   // pooling logic starts
 
-  private pollingSub: Subscription | null = null;
-  private newOrderSubject = new Subject<Order>();
-  newOrder$ = this.newOrderSubject.asObservable();
-
-  private placedOrdersSubject = new BehaviorSubject<Order[]>([]);
-  placedOrders$ = this.placedOrdersSubject.asObservable();
-
-  startPolling(): void {
-    const restaurantId = localStorage.getItem('restaurantId');
-    if (!restaurantId) {
-      console.warn('restaurantId not found in localStorage');
-      return;
-    }
-
-    const pollingInterval = 10000; // 10 sec
-
-    this.pollingSub = interval(pollingInterval).subscribe(() => {
-      // Polling for PLACED orders
-      const placedOrdersApiUrl = `https://kovela.app/order/api/orders/status?status=PLACED&page=0&size=10&businessId=${restaurantId}`;
-      this.http.get<{ data: { content: Order[] } }>(placedOrdersApiUrl).subscribe({
-        next: (response) => {
-          const placedOrders = response?.data?.content || [];
-          if (placedOrders.length > 0) {
-            placedOrders.forEach((order) => {
-              this.notifyNewOrder(order);
-            });
-          }
-        },
-        error: (err) => {
-          console.error('Error fetching placed orders:', err);
-        },
-      });
-
-      // Polling for PREPARING orders that are now completed
-      const preparingOrdersApiUrl = `https://kovela.app/order/api/orders/user/filter?businessId=${restaurantId}&page=0&size=10&orderStatus=PREPARING`;
-      this.http.get<{ data: { content: Order[] } }>(preparingOrdersApiUrl).subscribe({
-        next: (response) => {
-          const completedPreparingOrders = response?.data?.content?.filter(
-            (order) => order.timmimgs === 'COMPLETED'
-          ) || [];
-          if (completedPreparingOrders.length > 0) {
-            completedPreparingOrders.forEach((order) => {
-              this.notifyNewOrder(order);
-            });
-          }
-        },
-        error: (err) => {
-          console.error('Error fetching completed preparing orders:', err);
-        },
-      });
-    });
-  }
-
-  private totalElementsSubject = new BehaviorSubject<number>(0);
-  totalElements$ = this.totalElementsSubject.asObservable();
-
-  private notifyNewOrder(order: Order): void {
-    this.newOrderSubject.next(order);
-  }
-
-  stopPolling(): void {
-    if (this.pollingSub) {
-      this.pollingSub.unsubscribe();
-      this.pollingSub = null;
-    }
-  }
-
-  // polling logic end
+  
 
   getRestaurantProfile(businessId: string): Observable<BusinessResponse> {
     const getProfileUrl = 'https://kovela.app/usermgmt/business/';

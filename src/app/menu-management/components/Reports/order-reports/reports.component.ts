@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MenuManagementService } from '../../menuManagementService/menu-management.service';
+import { MenuManagementService } from '../../../menuManagementService/menu-management.service';
 
 @Component({
   selector: 'app-reports',
@@ -146,7 +146,6 @@ export class ReportsComponent implements OnInit {
   }
 
   fetchOrders(): void {
-    this.loading = true;
     const params: any = {
       status: this.orderStatus === 'ALL_ORDERS' ? '' : this.orderStatus,
       orderType: this.orderType,

@@ -1,7 +1,0 @@
-<div class="quantityMain">
-  <div class="quantity">
-    <button class="minus" (click)="decrement()" [disabled]="tempQuantity <= minQuantity" aria-label="Decrease">−</button>
-    <input type="number" [value]="tempQuantity" (input)="onInputChange($event)" class="input-box" [min]="minQuantity" max="10">
-    <button class="plus" (click)="increment()" aria-label="Increase">+</button>
-  </div>
-</div>

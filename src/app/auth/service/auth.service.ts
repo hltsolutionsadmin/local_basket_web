@@ -20,43 +20,45 @@ export class AuthService {
     });
 
     loginTriggerOTP(payload: OtpRequestPayload): Observable<any> {
-      const loginUrl = this.apiConfig.getEndpoint('loginTriggerOtp');
-      return this.http.post<any>(loginUrl, payload);
+      const loginUrl = this.apiConfig.getEndpoint('AuthEndpoint');
+      return this.http.post<any>(`${loginUrl}/jtuserotp/trigger/otp?triggerOtp=false`, payload);
   }
 
     validateOtp(payload: ValidateOtpPayload): Observable<any> {
-      const validateUrl = this.apiConfig.getEndpoint('validateMobileOtp');
-        return this.http.post<any>(validateUrl, payload);
+      const validateUrl = this.apiConfig.getEndpoint('AuthEndpoint');
+        return this.http.post<any>(`${validateUrl}/login`, payload);
     }
 
-    restaurentRegistration(payload: RestaurentRegister): Observable<any> {
-      const restaurantUrl = this.apiConfig.getEndpoint('restaurentRegister');
-        return this.http.post<any>(restaurantUrl, payload);
-    }
+
 
     refreshAccessToken(): Observable<any> {
       const refreshToken = this.tokenService.getRefreshToken();
       if (!refreshToken) {
         throw new Error('Refresh token not available.');
       }
-      const refreshUrl = this.apiConfig.getEndpoint('refreshTokenUrl');
+      const refreshUrl = this.apiConfig.getEndpoint('AuthEndpoint');
       const payload = { refreshToken: refreshToken };
-  
-      return this.http.post<any>(refreshUrl, payload);
+
+      return this.http.post<any>(`${refreshUrl}/refreshToken`, payload);
     }
   
     logoutUser(): void {
       this.tokenService.clearTokens();
     }
 
+        restaurentRegistration(payload: RestaurentRegister): Observable<any> {
+      const restaurantUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+        return this.http.post<any>(`${restaurantUrl}/onboard`, payload);
+    }
+
     getCurrentUser(): Observable<any> {
-      const currentUserUrl = this.apiConfig.getEndpoint('getCurrentUser');
-      return this.http.get<any>(currentUserUrl);
+      const currentUserUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+      return this.http.get<any>(`${currentUserUrl}/status`);
     } 
 
   assignRole(): Observable<any> {
     const assignRoleUrl = this.apiConfig.getEndpoint('addRestaurantRole');
-    return this.http.put(assignRoleUrl, {});
+    return this.http.put(`${assignRoleUrl}/user/role/ROLE_RESTAURANT_OWNER`, {});
   }
 
   getLocationService(): Promise<any> {

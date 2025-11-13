@@ -5,7 +5,7 @@ import { BehaviorSubject, debounceTime, distinctUntilChanged, finalize, map, Obs
 import { MenuManagementService } from '../../menuManagementService/menu-management.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenService } from '../../../core/service/token.service';
-import { TimeToggleComponent } from '../popupScreens/time-toggle/time-toggle.component';
+import { TimeToggleComponent } from './time-toggle/time-toggle.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({

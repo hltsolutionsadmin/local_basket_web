@@ -19,36 +19,36 @@ export class MenuManagementService {
 
 
   categoryMenu(): Observable<Category[]> {
-    const getCategorysUrl = this.apiConfig.getEndpoint('getCategorys');
-    return this.http.get<Category[]>(`${getCategorysUrl}`, { headers: this.jsonHeaders });
+    const getCategorysUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.get<Category[]>(`${getCategorysUrl}/categories`, { headers: this.jsonHeaders });
   }
 
 
   getMenuItems(restaurantId: string, page: number, size: number): Observable<any> {
-    const getMenuItemsUrl = this.apiConfig.getEndpoint('getMenuItems');
-    const url = `${getMenuItemsUrl}${restaurantId}?size=${size}&page=${page}`;
+    const getMenuItemsUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    const url = `${getMenuItemsUrl}/api/products/restaurant/${restaurantId}?size=${size}&page=${page}`;
     return this.http.get<any>(url);
   }
 
   searchMenuItems(restaurantId: string, page: number, size: number, keyword: string = ''): Observable<any> {
-    const searchMenuItemsUrl = this.apiConfig.getEndpoint('searchMenuItems');
-    const url = `${searchMenuItemsUrl}${restaurantId}?size=${size}&page=${page}&keyword=${encodeURIComponent(keyword)}`;
+    const searchMenuItemsUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    const url = `${searchMenuItemsUrl}/api/products/restaurant/${restaurantId}?size=${size}&page=${page}&keyword=${encodeURIComponent(keyword)}`;
     return this.http.get<any>(url);
   }
 
   createOrUpdateProduct(formData: FormData): Observable<any> {
-    const addUpdateItemUrl = this.apiConfig.getEndpoint('addUpdateItem');
-    return this.http.post(addUpdateItemUrl, formData);
+    const addUpdateItemUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.post(`${addUpdateItemUrl}/api/products/create`, formData);
   }
 
  deleteMenuItem(productId: number): Observable<any> {
-  const deleteItemUrl = this.apiConfig.getEndpoint('deleteItem');
-    return this.http.delete(`${deleteItemUrl}${productId}`);
+  const deleteItemUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.delete(`${deleteItemUrl}/api/products/delete/${productId}`);
   }
 
    toggleMenuItemAvailability(restaurantId: string, productId: any): Observable<any> {
-    const itemAvailabilityUrl = this.apiConfig.getEndpoint('itemAvailability');
-    const url = `${itemAvailabilityUrl}${productId}/toggle-availability`;
+    const itemAvailabilityUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    const url = `${itemAvailabilityUrl}/api/products/${productId}/toggle-availability`;
     return this.http.patch(url, {}, {
       headers: new HttpHeaders({
         'Business-Id': restaurantId
@@ -110,22 +110,22 @@ export class MenuManagementService {
   }
 
   getProductReports(params: any): Observable<any> {
-    const getProductReportsUrl = this.apiConfig.getEndpoint('getProductReports');
+    const getProductReportsUrl = this.apiConfig.getEndpoint('OrderEndpoint');
     let httpParams = new HttpParams();
     Object.keys(params).forEach(key => {
       // Include all parameters, even if empty
       httpParams = httpParams.set(key, params[key] != null ? params[key].toString() : '');
     });
-    return this.http.get(`${ getProductReportsUrl }`, { params: httpParams });
+    return this.http.get(`${ getProductReportsUrl }/report/outlet-itemwise/paged`, { params: httpParams });
   }
 
    downloadProductReportsExcel(params: any): Observable<Blob> {
-    const downloadProductReportsExcelUrl = this.apiConfig.getEndpoint('downloadProductReportsExcel');
+    const downloadProductReportsExcelUrl = this.apiConfig.getEndpoint('OrderEndpoint');
     let httpParams = new HttpParams();
     Object.keys(params).forEach(key => {
       httpParams = httpParams.set(key, params[key] != null ? params[key].toString() : '');
     });
-    return this.http.get(`${downloadProductReportsExcelUrl}`, {
+    return this.http.get(`${downloadProductReportsExcelUrl}/report/outlet-itemwise/excel`, {
       params: httpParams,
       responseType: 'blob'
     });
