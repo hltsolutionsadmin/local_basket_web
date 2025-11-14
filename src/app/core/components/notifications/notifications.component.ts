@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { DatePipe } from '@angular/common';
 import { LayoutHomeService } from '../../../layout-home/service/layout-home.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { from, Subject, switchMap, takeUntil } from 'rxjs';
@@ -30,7 +29,7 @@ import { PoolingService } from '../../service/pooling.service';
       ])
     ])
   ],
-  providers: [DatePipe]
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent implements OnInit {
   orders: OrderOnline[] = [];
@@ -142,6 +141,8 @@ export class NotificationsComponent implements OnInit {
           const minutes = preparationTime.split(':')[1];
           const formattedPreparationTime = minutes.padStart(2, '0');
 
+          // Stop buzzer immediately on accept
+          this.pollingService.stopBuzzer();
           return this.orderService.updateOrderStatus(order.orderNumber, 'PREPARING', formattedPreparationTime, '');
         }),
         takeUntil(this.destroy$)
@@ -160,6 +161,8 @@ export class NotificationsComponent implements OnInit {
 
   markAsReadyForPickup(order: OrderOnline): void {
     this.isLoading = true;
+    // Stop buzzer immediately when marking ready for pickup
+    this.pollingService.stopBuzzer();
     this.orderService.updateOrderStatus(order.orderNumber, 'READY_FOR_PICKUP', '0', '').pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -183,6 +186,8 @@ export class NotificationsComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
+          // Stop buzzer immediately on reject
+          this.pollingService.stopBuzzer();
           this.orderService
             .updateOrderStatus(order.orderNumber, 'REJECTED', result.notes, result.updatedBy)
             .pipe(takeUntil(this.destroy$))

@@ -1,147 +1,126 @@
-<div class="container" style="display: flex;
-    flex-direction: column;
-    overflow: auto;
-    height: 100vh;
-    padding: 2rem;">
-  <h5 class="mb-3 fw-bold">Restaurant Profile Settings</h5>
-  <p class="text-muted mb-4">Manage your restaurant 's operational settings and preferences</p>
-
-  <!-- Restaurant Info -->
-  <div class="card mb-3 shadow-sm">
-    <div class="card-body">
-      <h6 class="card-title mb-3 fw-semibold" style="color: #111827;">
-        <mat-icon style="
-    background: #ffedd5;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    color: #ea580c;
-    margin-right: .5rem;">store</mat-icon>Restaurant Information
-      </h6>
-
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label>Restaurant Name</label>
-          <input class="form-control" [(ngModel)]="profile.name" readonly />
-        </div>
-        <div class="col-md-6">
-          <label>Phone Number</label>
-          <input class="form-control" [(ngModel)]="profile.phone" readonly />
-        </div>
-        <div class="col-md-6">
-          <label>GST Number</label>
-          <input class="form-control" [(ngModel)]="profile.gstNumber" [readonly]="profile.gstNumber" />
-        </div>
-         <div class="col-md-6">
-          <label>FSSAI Number</label>
-          <input class="form-control" [(ngModel)]="profile.fssaiNumber" [readonly]="profile.fssaiNumber" />
-        </div>
-        
-        <div class="col-md-6">
-          <label>Email</label>
-          <input class="form-control" [(ngModel)]="profile.email" />
-        </div>
-        <div class="col-md-6">
-          <label>Cuisine Type</label>
-          <select class="form-select" [(ngModel)]="profile.cuisine">
-            <option *ngFor="let cuisine of cuisines">{{ cuisine }}</option>
-          </select>
-        </div>
-
-        <div class="col-md-12">
-          <label>Address</label>
-          <input class="form-control" [(ngModel)]="profile.address" readonly />
-        </div>
-      </div>
+<div class="profile-settings-container">
+  <!-- Scrollable Card -->
+  <div class="settings-card" @slideInOut>
+    <div class="card-header">
+      <h2 class="d-flex align-items-center mb-0">
+        <mat-icon class="me-2">settings</mat-icon>
+        Restaurant Settings
+      </h2>
     </div>
-  </div>
 
-  <!-- Operating Hours -->
-  <div class="card mb-3 shadow-sm">
     <div class="card-body">
-      <h6 class="card-title fw-semibold" style="color: #111827;">
-        <mat-icon style="background: #dbeafe;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    color: #2563eb;
-    margin-right: .5rem;">access_time</mat-icon>Restaurant Operating Hours
-      </h6>
-      <div class="row g-3 mt-2">
+      <form [formGroup]="form" class="row g-3">
+
+        <!-- Restaurant Name -->
         <div class="col-md-6">
-          <label>Start Time</label>
-          <input type="time" class="form-control" [(ngModel)]="profile.startTime" />
+          <label class="form-label fw-semibold">Restaurant Name</label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>store</mat-icon></span>
+            <input type="text" class="form-control" formControlName="restaurantName" readonly>
+          </div>
         </div>
+
+        <!-- Contact Number -->
         <div class="col-md-6">
-          <label>End Time</label>
-          <input type="time" class="form-control" [(ngModel)]="profile.endTime" />
+          <label class="form-label fw-semibold">Contact Number</label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>contact_phone</mat-icon></span>
+            <input type="text" class="form-control" formControlName="contactNumber" readonly>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- KOT Slip Password -->
-  <div class="card mb-3 shadow-sm">
-    <div class="card-body">
-      <h6 class="card-title fw-semibold" style="color: #111827;">
-        <mat-icon style="background: #dcfce7;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    color: #16a34a;
-    margin-right: .5rem;">lock</mat-icon>KOT Slip Regeneration Password
-      </h6>
-      <div class="mt-2">
-        <label>Password</label>
-        <input type="password" class="form-control" [(ngModel)]="profile.kotPassword" placeholder="Enter new password" />
-        <small class="text-muted mt-1 d-block">Password must be at least 6 characters long</small>
-      </div>
-    </div>
-  </div>
-
-  <!-- Online Delivery -->
-  <div class="card mb-3 shadow-sm">
-    <div class="card-body">
-      <h6 class="card-title fw-semibold" style="color: #111827;">
-        <mat-icon style="background: #dbeafe;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    color: #2563eb;
-    margin-right: .5rem;">motorcycle</mat-icon>Online Delivery Integration
-      </h6>
-      <div class="d-flex justify-content-between align-items-center mt-2">
-        <div class="d-flex">
-             <span>Enable Online Delivery Integration</span>
-            <p class="d-flex" [ngClass]="{ 'lable-sucess' : profile.deliveryEnabled, 'lable-wrong' : !profile.deliveryEnabled}" for="deliveryToggle" [ngClass]="{ 'text-success': profile.deliveryEnabled }">
-           <mat-icon class="mat-check-icon-sucess"
-           [ngClass]="{
-            'mat-check-icon-sucess': profile.deliveryEnabled,
-            'mat-check-icon-wrong' : !profile.deliveryEnabled
-           }"
-    >{{ profile.deliveryEnabled ? 'check_circle' : 'error' }}</mat-icon> {{ profile.deliveryEnabled ? 'Active' : 'Inactive' }}
-          </p>
+        <!-- FSSAI Number -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            FSSAI Number
+            <small *ngIf="fssaiReadOnly" class="text-muted ms-1">(Locked)</small>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>assignment</mat-icon></span>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="fssaiNumber"
+              [readonly]="fssaiReadOnly"
+              [class.bg-light]="fssaiReadOnly"
+              placeholder="{{ fssaiReadOnly ? 'Already set' : 'Enter FSSAI number' }}"
+            >
+          </div>
         </div>
-       
-        <div class="form-check form-switch">
-          <input type="checkbox" class="form-check-input" id="deliveryToggle" [(ngModel)]="profile.deliveryEnabled">
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Save Button -->
-  <div class="d-flex justify-content-end">
-    <button class="btn btn-primary px-4" (click)="saveChanges()">
-      <i class="bi bi-save me-1"></i> Save Changes
-    </button>
+        <!-- GST Number -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            GST Number
+            <small *ngIf="gstReadOnly" class="text-muted ms-1">(Locked)</small>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>receipt</mat-icon></span>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="gstNumber"
+              [readonly]="gstReadOnly"
+              [class.bg-light]="gstReadOnly"
+              placeholder="{{ gstReadOnly ? 'Already set' : 'Enter GST number' }}"
+            >
+          </div>
+        </div>
+
+        <!-- Opening Time -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Opening Time(Use 24hr format)</label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>access_time</mat-icon></span>
+            <input type="time" class="form-control" formControlName="openingTime">
+          </div>
+        </div>
+
+        <!-- Closing Time -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Closing Time(Use 24hr format)</label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>access_time</mat-icon></span>
+            <input type="time" class="form-control" formControlName="closingTime">
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><mat-icon>location_on</mat-icon></span>
+            <textarea
+              class="form-control"
+              rows="2"
+              formControlName="address"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Sticky Footer Buttons -->
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="onCancel()"
+        [disabled]="saving"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary d-flex align-items-center"
+        [disabled]="form.invalid || saving"
+        (click)="save()"
+      >
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+        {{ saving ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
   </div>
 </div>

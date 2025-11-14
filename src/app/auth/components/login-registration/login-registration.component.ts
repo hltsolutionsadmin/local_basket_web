@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { OtpRequestPayload, ValidateOtpPayload } from '../../model/interface.auth';
-import { finalize } from 'rxjs/operators';
+import { finalize, take } from 'rxjs/operators';
+import { lastValueFrom } from 'rxjs';
 import { TokenService } from '../../../core/service/token.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -13,6 +14,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./login-registration.component.scss'],
 })
 export class LoginRegistrationComponent {
+
   private readonly OTP_LENGTH = 6;
   private readonly MOBILE_NUMBER_PATTERN = /^\d{10}$/;
   private readonly ERROR_MESSAGES = {
@@ -30,6 +32,8 @@ export class LoginRegistrationComponent {
   otp: string[] = Array(this.OTP_LENGTH).fill('');
   otpLogin: string | null = null;
   responseOtp: string | null = null;
+  sendingOtp = false;
+  verifyingOtp = false;
 
   // Services
   private authService = inject(AuthService);
@@ -44,6 +48,7 @@ export class LoginRegistrationComponent {
   }
 
   async sendOtp(): Promise<void> {
+    if (this.sendingOtp) return;
     this.loginForm.markAllAsTouched();
     if (this.loginForm.invalid) {
       this.errorMessage = this.ERROR_MESSAGES.INVALID_MOBILE;
@@ -52,21 +57,28 @@ export class LoginRegistrationComponent {
 
     this.errorMessage = '';
     this.tokenService.show();
+    this.sendingOtp = true;
     const payload: OtpRequestPayload = {
-      primaryContact: this.loginForm.value.mobileNumber.trim(),
+      primaryContact: String(this.loginForm.value.mobileNumber || '').trim(),
       otpType: 'SIGNIN',
     };
 
     try {
-      const res = await this.authService.loginTriggerOTP(payload).pipe(finalize(() => this.tokenService.hide())).toPromise();
+      const res = await lastValueFrom(
+        this.authService
+          .loginTriggerOTP(payload)
+          .pipe(take(1), finalize(() => { this.tokenService.hide(); this.sendingOtp = false; }))
+      );
       this.otpLogin = res.otp;
       this.showOtpScreen = true;
     } catch (err: any) {
       this.handleError(err, this.ERROR_MESSAGES.USER_NOT_FOUND);
+      this.sendingOtp = false;
     }
   }
 
   async verifyOtp(): Promise<void> {
+    if (this.verifyingOtp) return;
     const otpCode = this.otp.join('');
     if (otpCode.length !== this.OTP_LENGTH || !/^\d{6}$/.test(otpCode)) {
       this.errorMessage = this.ERROR_MESSAGES.INVALID_OTP;
@@ -75,13 +87,18 @@ export class LoginRegistrationComponent {
 
     this.errorMessage = '';
     this.tokenService.show();
+    this.verifyingOtp = true;
     const payload: ValidateOtpPayload = {
-      primaryContact: this.loginForm.value.mobileNumber,
+      primaryContact: String(this.loginForm.value.mobileNumber || '').trim(),
       otp: otpCode,
     };
 
     try {
-      const res = await this.authService.validateOtp(payload).pipe(finalize(() => this.tokenService.hide())).toPromise();
+      const res = await lastValueFrom(
+        this.authService
+          .validateOtp(payload)
+          .pipe(take(1), finalize(() => { this.tokenService.hide(); this.verifyingOtp = false; }))
+      );
       this.responseOtp = res.otp;
       localStorage.setItem('accessToken', res.token);
       localStorage.setItem('refreshToken', res.refreshToken);
@@ -89,6 +106,7 @@ export class LoginRegistrationComponent {
     } catch (err: any) {
       this.handleError(err, this.ERROR_MESSAGES.INVALID_OTP_CODE);
       this.otp = Array(this.OTP_LENGTH).fill('');
+      this.verifyingOtp = false;
     }
   }
 
@@ -102,8 +120,11 @@ export class LoginRegistrationComponent {
 
     this.tokenService.show();
     try {
-      const response = await this.authService.getCurrentUser().pipe(finalize(() => this.tokenService.hide())).toPromise();
+      const response = await lastValueFrom(
+        this.authService.getCurrentUser().pipe(take(1), finalize(() => this.tokenService.hide()))
+      );
       const user = response[0];
+
       if (!user) {
         await this.router.navigate(['/auth/loginRegistration']);
         return;

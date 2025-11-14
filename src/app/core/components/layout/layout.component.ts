@@ -1,9 +1,8 @@
-  import { Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { catchError, delay, filter, finalize, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import {Component,ElementRef,HostListener,inject,OnInit,ViewChild,} from '@angular/core';
+import {catchError,delay,filter,finalize,of,Subject,Subscription,switchMap,tap} from 'rxjs';
 import { Router } from '@angular/router';
 import { NotificationsComponent } from '../notifications/notifications.component';
-import { ApiConfigService } from '../../service/api-config.service';
-import { BusinessUser, Order } from '../../interface/eatoInterface';
+import {BusinessUser,Order} from '../../interface/eatoInterface';
 import { TokenService } from '../../service/token.service';
 import { PoolingService } from '../../service/pooling.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +12,7 @@ import { AuthService } from '../../../auth/service/auth.service';
   selector: 'app-layout',
   standalone: false,
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss'
+  styleUrl: './layout.component.scss',
 })
 export class LayoutComponent implements OnInit {
   restaurantName: string | null = null;
@@ -27,7 +26,6 @@ export class LayoutComponent implements OnInit {
   currentUser: BusinessUser | null = null;
   loading = false;
 
-
   private readonly newOrdersBuffer = new Subject<Order>();
   private readonly subscriptions = new Subscription();
 
@@ -37,13 +35,17 @@ export class LayoutComponent implements OnInit {
   private readonly elementRef = inject(ElementRef);
   private readonly snackBar = inject(MatSnackBar);
   private readonly authService = inject(AuthService);
+  // private readonly dialog = inject(MatDialog); 
 
   @ViewChild('notificationPanel') notificationPanel!: NotificationsComponent;
 
   ngOnInit() {
     const currentUser = this.tokenService.getCurrentUserValue();
-    this.restaurantName = currentUser?.businessName || localStorage.getItem('restaurantName') || 'restaurantName';
-     this.tokenService.user$.subscribe((user) => {
+    this.restaurantName =
+      currentUser?.businessName ||
+      localStorage.getItem('restaurantName') ||
+      'restaurantName';
+    this.tokenService.user$.subscribe((user) => {
       if (user) {
         this.currentUser = user;
         this.restaurantName = user.businessName;
@@ -54,7 +56,8 @@ export class LayoutComponent implements OnInit {
     this.subscriptions.add(
       this.apiConfig.newOrder$.subscribe({
         next: (order: Order) => this.newOrdersBuffer.next(order),
-        error: (error) => console.error('Error from ApiConfigService newOrder$:', error)
+        error: (error) =>
+          console.error('Error from ApiConfigService newOrder$:', error),
       })
     );
 
@@ -64,20 +67,23 @@ export class LayoutComponent implements OnInit {
         error: (error) => {
           console.error('Error fetching totalElements:', error);
           this.totalElements = 0;
-        }
+        },
       })
     );
   }
 
   ngAfterViewInit() {
     this.subscriptions.add(
-      this.newOrdersBuffer.pipe(filter(() => !!this.notificationPanel)).subscribe({
-        next: (order: any) => {
-          this.notificationPanel.addOrder(order);
+      this.newOrdersBuffer
+        .pipe(filter(() => !!this.notificationPanel))
+        .subscribe({
+          next: (order: any) => {
+            this.notificationPanel.addOrder(order);
             this.isPanelOpen = true;
-        },
-        error: (error) => console.error('Error processing buffered new orders:', error)
-      })
+          },
+          error: (error) =>
+            console.error('Error processing buffered new orders:', error),
+        })
     );
   }
 
@@ -86,7 +92,7 @@ export class LayoutComponent implements OnInit {
     this.isReportsSubMenuOpen = !this.isReportsSubMenuOpen;
   }
 
-toggleOnline(enabled: boolean) {
+  toggleOnline(enabled: boolean) {
     if (!this.currentUser) return;
 
     const restaurantId = this.currentUser.id;
@@ -103,9 +109,9 @@ toggleOnline(enabled: boolean) {
           const user = response[0];
           this.currentUser = user;
           if (user) {
-            this.tokenService.setUser(user);  
+            this.tokenService.setUser(user);
             this.isOnline = user.enabled;
-           this.isDropdownOpen = false;
+            this.isDropdownOpen = false;
           }
         }),
         finalize(() => (this.loading = false)),
@@ -114,7 +120,7 @@ toggleOnline(enabled: boolean) {
           // Rollback UI state if API fails
           this.isOnline = !enabled;
           this.snackBar.open('Failed to update status', 'Close', {
-            duration: 2000,
+            duration: 10000,
             panelClass: ['snack-error'],
           });
           return of(null);
@@ -136,7 +142,10 @@ toggleOnline(enabled: boolean) {
 
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event) {
-    if (this.isDropdownOpen && !this.elementRef.nativeElement.contains(event.target)) {
+    if (
+      this.isDropdownOpen &&
+      !this.elementRef.nativeElement.contains(event.target)
+    ) {
       this.isDropdownOpen = false;
     }
   }

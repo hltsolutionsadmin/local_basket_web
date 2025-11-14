@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { Items, MenuItemsResponse } from '../../models/interface.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, debounceTime, distinctUntilChanged, finalize, map, Observable, Subscription } from 'rxjs';
@@ -12,7 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
   selector: 'app-item-availability',
   standalone: false,
   templateUrl: './item-availability.component.html',
-  styleUrl: './item-availability.component.scss'
+  styleUrl: './item-availability.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ItemAvailabilityComponent {
   private readonly tokenService = inject(TokenService);
@@ -54,7 +55,6 @@ export class ItemAvailabilityComponent {
   private searchSubscription = new Subscription();
 
   onSearch(query: string): void {
-    debugger
      this.searchSubject.next(query);
   }
 

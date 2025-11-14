@@ -100,6 +100,26 @@ export interface BusinessRequest {
   attributes: { attributeName: string; attributeValue: string }[];
 }
 
+// Supports both create (without id) and update (with id) using FormData payload
+export interface BusinessUpsert {
+  id?: number;
+  businessName?: string;
+  categoryId?: number;
+  addressLine1?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: string | number;
+  longitude?: string | number;
+  contactNumber?: string;
+  // Optional attributes by name
+  gstNumber?: string;
+  fssaiNumber?: string;
+  loginTime?: string;  // opening time
+  logoutTime?: string; // closing time
+}
+
 // api config service interface
 
 export interface OrderItem {
@@ -205,4 +225,21 @@ export interface BusinessUser {
   approved: boolean;
   roles: BusinessRole[];
   attributes: BusinessAttribute[];
+}
+
+// profile component businessdetails
+
+export interface BusinessDetails {
+  id: number;
+  businessName: string;
+  contactNumber: string;
+  addressDTO?: {
+    addressLine1: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
+  attributes?: Attribute[];
+  openingTime?: string;
+  closingTime?: string;
 }
