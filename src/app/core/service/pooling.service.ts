@@ -22,7 +22,10 @@ export class PoolingService {
   private placedOrdersSubject = new BehaviorSubject<Order[]>([]);
   placedOrders$ = this.placedOrdersSubject.asObservable();
 
-   startPolling(): void {
+  // Buzzer audio references to allow immediate stop
+  private buzzers: HTMLAudioElement[] = [];
+
+  startPolling(): void {
     if (this.pollingActive) return; // prevent duplicate polling
     this.pollingActive = true;
 
@@ -75,26 +78,51 @@ export class PoolingService {
   // 🔊 When a new order arrives
   private notifyNewOrder(order: Order): void {
     this.newOrderSubject.next(order);
+    // 🔔 Play buzzer sound and keep references for immediate stop
+    this.playBuzzer();
+  }
 
-    // 🔔 Play buzzer sound (safe for Electron & browser)
+  private playBuzzer(): void {
     try {
-      const audio = new Audio('assets/audio/buzzer-227217.mp3');
+      // Ensure any existing buzzers are stopped before starting new ones
+      this.stopBuzzer();
+
+      const audio = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
       audio.volume = 0.6;
       audio.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);
       });
-       const audio1 = new Audio('assets/audio/buzzer-227217.mp3');
+      this.buzzers.push(audio);
+
+      const audio1 = new Audio('assets/audio/buzzer-227217.mp3');
       audio1.volume = 0.8;
       audio1.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);
       });
-       const audio2 = new Audio('assets/audio/buzzer-227217.mp3');
+      this.buzzers.push(audio1);
+
+      const audio2 = new Audio('assets/audio/buzzer-227217.mp3');
       audio2.volume = 1.0;
       audio2.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);
       });
+      this.buzzers.push(audio2);
     } catch (error) {
       console.error('Error playing buzzer sound:', error);
+    }
+  }
+
+  // Call to immediately stop any buzzer sound
+  stopBuzzer(): void {
+    try {
+      this.buzzers.forEach(a => {
+        try {
+          a.pause();
+          a.currentTime = 0;
+        } catch {}
+      });
+    } finally {
+      this.buzzers = [];
     }
   }
 
@@ -104,6 +132,8 @@ export class PoolingService {
       this.pollingSub = null;
     }
     this.pollingActive = false;
+    // Ensure buzzer is stopped when polling stops
+    this.stopBuzzer();
   }
   // polling logic end
 }

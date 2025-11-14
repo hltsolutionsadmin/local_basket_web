@@ -46,9 +46,9 @@ export class AuthService {
       this.tokenService.clearTokens();
     }
 
-        restaurentRegistration(payload: RestaurentRegister): Observable<any> {
+    restaurentRegistration(formData: FormData): Observable<any> {
       const restaurantUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
-        return this.http.post<any>(`${restaurantUrl}/onboard`, payload);
+      return this.http.post<any>(`${restaurantUrl}/onboard`, formData);
     }
 
     getCurrentUser(): Observable<any> {
@@ -57,7 +57,7 @@ export class AuthService {
     } 
 
   assignRole(): Observable<any> {
-    const assignRoleUrl = this.apiConfig.getEndpoint('addRestaurantRole');
+    const assignRoleUrl = this.apiConfig.getEndpoint('UserEndpoint');
     return this.http.put(`${assignRoleUrl}/user/role/ROLE_RESTAURANT_OWNER`, {});
   }
 

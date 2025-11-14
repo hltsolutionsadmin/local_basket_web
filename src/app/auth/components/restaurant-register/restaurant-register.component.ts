@@ -1,13 +1,15 @@
 import { AfterViewInit, Component, inject, NgZone, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
-import { LocationData, RestaurentRegister } from '../../model/interface.auth';
-import { finalize } from 'rxjs';
+import { LocationData } from '../../model/interface.auth';
+import { finalize, lastValueFrom } from 'rxjs';
 import { TokenService } from '../../../core/service/token.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LocationDialogComponent } from '../location-dialog/location-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ApiConfigService } from '../../../core/service/api-config.service';
+import { take } from 'rxjs/operators';
 declare const google: any;
 
 @Component({
@@ -16,6 +18,7 @@ declare const google: any;
   templateUrl: './restaurant-register.component.html',
   styleUrl: './restaurant-register.component.scss'
 })
+
 export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
   private readonly DEFAULT_COORDINATES: google.maps.LatLngLiteral = { lat: 20.5937, lng: 78.9629 };
   private readonly ERROR_MESSAGES = {
@@ -33,7 +36,6 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
   form: FormGroup;
   isSubmitting = false;
   isLoadingLocation = false;
-  locationError: string | null = null;
   searchQuery = '';
   mapCenter: google.maps.LatLngLiteral = this.DEFAULT_COORDINATES;
   markerPosition: google.maps.LatLngLiteral = this.DEFAULT_COORDINATES;
@@ -61,6 +63,7 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
   private readonly http = inject(HttpClient);
   private readonly ngZone = inject(NgZone);
   private readonly dialog = inject(MatDialog);
+  private readonly apiConfig = inject(ApiConfigService);
 
   private map: google.maps.Map | undefined;
   private geocoder: google.maps.Geocoder | undefined;
@@ -68,8 +71,8 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
   constructor() {
     this.form = this.fb.group({
       businessName: ['', Validators.required],
-      gstNumber: ['', Validators.required],
-      fssaiNumber: ['', Validators.required],
+      gstNumber: [''],
+      fssaiNumber: [''],
       addressLine1: ['', Validators.required],
       city: ['', Validators.required],
       state: ['', Validators.required],
@@ -147,7 +150,6 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
     }
 
     this.isLoadingLocation = true;
-    this.locationError = null;
 
     try {
       const results = await this.geocode({ address: this.searchQuery });
@@ -163,8 +165,7 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
       } else {
         this.handleError(this.ERROR_MESSAGES.LOCATION_NOT_FOUND);
       }
-    } 
-    catch (error) {
+    } catch (error) {
       this.handleError(this.ERROR_MESSAGES.LOCATION_NOT_FOUND);
     } finally {
       this.isLoadingLocation = false;
@@ -178,7 +179,6 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
     }
 
     this.isLoadingLocation = true;
-    this.locationError = null;
 
     try {
       const results = await this.geocode({ location: latLng });
@@ -276,27 +276,37 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
     this.tokenService.show();
 
     const fv = this.form.value;
-    const payload: RestaurentRegister = {
-      businessName: fv.businessName,
-      categoryId: 1,
-      addressLine1: fv.addressLine1,
-      city: fv.city,
-      state: typeof fv.state === 'object' ? fv.state.name : fv.state,
-      country: typeof fv.country === 'object' ? fv.country.name : fv.country,
-      postalCode: fv.postalCode,
-      contactNumber: fv.contactNumber,
-      latitude: fv.latitude,
-      longitude: fv.longitude,
-      attributes: [
-        { attributeName: 'GSTNumber', attributeValue: fv.gstNumber },
-        { attributeName: 'FSSAINumber', attributeValue: fv.fssaiNumber },
-        { attributeName: 'onlineAvailablility', attributeValue: false },
-      ],
-    };
+    const formData = new FormData();
+    formData.append('businessName', fv.businessName);
+    formData.append('categoryId', String(1));
+    formData.append('addressLine1', fv.addressLine1);
+    formData.append('city', fv.city);
+    formData.append('state', typeof fv.state === 'object' ? fv.state.name : fv.state);
+    formData.append('country', typeof fv.country === 'object' ? fv.country.name : fv.country);
+    formData.append('postalCode', fv.postalCode);
+    formData.append('latitude', String(fv.latitude));
+    formData.append('longitude', String(fv.longitude));
+    formData.append('contactNumber', fv.contactNumber);
+
+    let attrIndex = 0;
+    if (fv.gstNumber) {
+      formData.append(`attributes[${attrIndex}].attributeName`, 'GSTNumber');
+      formData.append(`attributes[${attrIndex}].attributeValue`, fv.gstNumber);
+      attrIndex++;
+    }
+    if (fv.fssaiNumber) {
+      formData.append(`attributes[${attrIndex}].attributeName`, 'FSSAINumber');
+      formData.append(`attributes[${attrIndex}].attributeValue`, fv.fssaiNumber);
+      attrIndex++;
+    }
+    formData.append(`attributes[${attrIndex}].attributeName`, 'onlineAvailablility');
+    formData.append(`attributes[${attrIndex}].attributeValue`, 'false');
 
     try {
-      await this.authService.restaurentRegistration(payload).pipe(finalize(() => this.tokenService.hide())).toPromise();
-      await this.authService.assignRole().toPromise();
+      await lastValueFrom(
+        this.authService.restaurentRegistration(formData).pipe(take(1), finalize(() => this.tokenService.hide()))
+      );
+      await lastValueFrom(this.authService.assignRole().pipe(take(1)));
       alert('Restaurant onboarded successfully');
       await this.router.navigate(['/auth/approvalPending']);
     } catch (err: any) {
@@ -308,7 +318,6 @@ export class RestaurantRegisterComponent implements OnInit, AfterViewInit {
 
   private handleError(message: string): void {
     this.tokenService.hide();
-    this.locationError = message;
     alert(message);
     console.error(message);
   }

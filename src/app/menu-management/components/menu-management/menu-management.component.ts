@@ -1,4 +1,4 @@
-import { ChangeDetectorRef,Component,inject,OnDestroy,OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef,Component,inject,OnDestroy,OnInit } from '@angular/core';
 import { MenuManagementService } from '../../menuManagementService/menu-management.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -14,7 +14,8 @@ import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/
   selector: 'app-menu-management',
   standalone: false,
   templateUrl: './menu-management.component.html',
-  styleUrls: ['./menu-management.component.scss']
+  styleUrls: ['./menu-management.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MenuManagementComponent implements OnInit , OnDestroy {
   private readonly service = inject(MenuManagementService);

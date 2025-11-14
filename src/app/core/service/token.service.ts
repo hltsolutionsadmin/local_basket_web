@@ -85,4 +85,28 @@ export class TokenService {
     })
   );
 }
+
+getBusinessDetails(restaurantId: string | number): Observable<any> {
+  const baseUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+  const url = `${baseUrl}/${restaurantId}`;
+
+  return this.http.get(url).pipe(
+    catchError((error) => {
+      console.error('Failed to fetch business details', error);
+      return throwError(() => new Error('Unable to fetch business details.'));
+    })
+  );
+}
+
+  // Upsert business (create or update) via FormData using the onboard API
+  upsertBusiness(form: FormData): Observable<any> {
+    const baseUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    const url = `${baseUrl}/onboard`;
+    return this.http.post(url, form).pipe(
+      catchError((error) => {
+        console.error('Failed to upsert business', error);
+        return throwError(() => new Error('Unable to save business details.'));
+      })
+    );
+  }
 }

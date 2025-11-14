@@ -1,23 +1,25 @@
-import { ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { LayoutHomeService } from '../../service/layout-home.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderActionComponent } from '../popupScreens/order-action/order-action.component';
-import { from, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { from, Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 // import { KotPrintComponent } from '../popupScreens/kot-print/kot-print.component';
 import { ActivatedRoute } from '@angular/router';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { enIN } from 'date-fns/locale'; 
 import { Order } from '../../models/interface.model';
-import { PrintService } from '../../service/print.service';
+import { PoolingService } from '../../../core/service/pooling.service';
 
 @Component({
   selector: 'app-delivery',
   standalone: false,
   templateUrl: './delivery.component.html',
   styleUrl: './delivery.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DeliveryComponent implements OnDestroy {
+export class DeliveryComponent implements OnInit, OnDestroy {
   tableData: Order[] = [];
   totalItems = 0;
   currentPageIndex = 0;
@@ -35,7 +37,8 @@ export class DeliveryComponent implements OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pollingService: PoolingService
   ) {}
 
   ngOnInit(): void {
@@ -206,6 +209,8 @@ export class DeliveryComponent implements OnDestroy {
       .pipe(
         switchMap((actionResult) => {
           if (!actionResult) return from([]);
+          // Stop buzzer immediately when the user accepts
+          this.pollingService.stopBuzzer();
           const preparationTime = actionResult.notes;
           const minutes = preparationTime.split(':')[1];
           const formattedPreparationTime = minutes.padStart(2, '0');
@@ -266,6 +271,8 @@ export class DeliveryComponent implements OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
+          // Stop buzzer immediately when the user rejects
+          this.pollingService.stopBuzzer();
           this.orderService
             .updateOrderStatus(
               order.orderNumber,
@@ -341,6 +348,8 @@ export class DeliveryComponent implements OnDestroy {
   }
 
   markReadyForPickup(order: any): void {
+    // Stop buzzer immediately when marking ready for pickup
+    this.pollingService.stopBuzzer();
     this.orderService
       .updateOrderStatus(order.orderNumber, 'READY_FOR_PICKUP', '0', '')
       .pipe(takeUntil(this.destroy$))
