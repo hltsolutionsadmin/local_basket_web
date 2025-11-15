@@ -7,9 +7,7 @@
     "CategorysEndpoint"          : "/product",
     "RestaurantEndpoint"         : "/restaurant",
     "OrderEndpoint"              : "/order",
-    "reportDinin"                : "/restaurant/api/report/view",
     "reportDelivery"             : "/order/api/orders/user/filter",
-    "reportDininExcel"           : "/restaurant/api/report/sales/excel",
     "reportDeliveryExcel"        : "/order/api/orders/user/filter/excel"
   }
 }

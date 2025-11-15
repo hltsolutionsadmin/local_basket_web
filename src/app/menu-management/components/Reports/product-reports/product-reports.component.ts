@@ -11,7 +11,7 @@ export class ProductReportsComponent {
   periodType: string = 'DAILY';
   fromDate: string = '';
   toDate: string = '';
-  orderType: string = 'DINE_IN';
+  orderType: string = 'DELIVERY';
   products: any[] = [];
   totalItems: number = 0;
   currentPage: number = 0;
@@ -68,9 +68,7 @@ export class ProductReportsComponent {
     return `${year}-${month}-${day}`;
   }
 
-  onOrderTypeChange(): void {
-    this.fetchProducts();
-  }
+  // Delivery-only: no order type switching
 
   canSearch(): boolean {
     return !!this.fromDate && !!this.toDate;
@@ -98,7 +96,7 @@ export class ProductReportsComponent {
       startDate: this.fromDate,
       endDate: this.toDate,
       businessId: localStorage.getItem('restaurantId') || 'defaultBusinessId',
-      type: this.orderType === 'DELIVERY' ? 'online' : '', // Always include type parameter
+      type:  'online', // Always include type parameter
       page: this.currentPage,
       size: this.pageSize
     };
@@ -149,7 +147,7 @@ export class ProductReportsComponent {
         businessId: localStorage.getItem('restaurantId') || 'defaultBusinessId',
         startDate: this.fromDate,
         endDate: this.toDate,
-        type: this.orderType === 'DELIVERY' ? 'online' : '' // Always include type parameter
+        type: 'online'
       };
 
       if (this.periodType !== 'NONE') {

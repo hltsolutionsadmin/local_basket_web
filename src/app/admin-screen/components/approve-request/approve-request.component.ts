@@ -51,12 +51,13 @@ export class ApproveRequestComponent {
         this.tableData = response.status.content.map(business => ({
           id: business.id,
           name: business.businessName,
-          fssaiNumber: business.attributes.find(attr => attr.attributeName === 'FSSAI Number')?.attributeValue || '--',
-          gstNumber: business.attributes.find(attr => attr.attributeName === 'GST Number')?.attributeValue || '--'
+          fssaiNumber: business.attributes.find(attr => attr.attributeName === 'FSSAINumber')?.attributeValue || '--',
+          gstNumber: business.attributes.find(attr => attr.attributeName === 'GSTNumber')?.attributeValue || '--'
         }));
         this.totalItems = response.status.totalElements;
       },
       error: () => {
+        this.tokenService.hide();
         this.snackBar.open('Error loading businesses', 'Close', { duration: 3000 });
       }
     });
@@ -83,6 +84,7 @@ export class ApproveRequestComponent {
         this.loadBusinesses();
       },
       error: () => {
+        this.tokenService.hide();
         this.snackBar.open(`Failed to approve business ${business.name}`, 'Close', { duration: 3000 });
       }
     });

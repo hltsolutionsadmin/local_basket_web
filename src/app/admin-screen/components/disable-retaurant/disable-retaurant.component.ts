@@ -3,6 +3,7 @@ import { AdminService } from '../../service/admin.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenService } from '../../../core/service/token.service';
 import { finalize } from 'rxjs';
+import { Router } from '@angular/router';
 
 interface TableBusiness {
   id: number;
@@ -22,6 +23,7 @@ export class DisableRetaurantComponent implements OnInit{
   tableData: TableBusiness[] = [];
   totalItems = 0;
   currentPageIndex = 0;
+  restaurantId : number | string = '';
 
   tableHeading = [
     { data: 'id', heading: 'Business ID' },
@@ -29,13 +31,14 @@ export class DisableRetaurantComponent implements OnInit{
     { data: 'fssaiNumber', heading: 'FSSAI Number' },
     { data: 'gstNumber', heading: 'GST Number' },
     {data: 'primaryContact' , heading: 'Mobile Number'},
-    { data: 'actions', heading: 'Actions' }
+    { data: 'actions', heading: 'Disable' }
   ];
   tokenService = inject(TokenService)
 
   constructor(
     private service: AdminService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private readonly route : Router
   ) {}
 
   ngOnInit() {
@@ -53,14 +56,15 @@ export class DisableRetaurantComponent implements OnInit{
         this.tableData = response.status.content.map(business => ({
           id: business.id,
           name: business.businessName,
-          fssaiNumber: business.attributes.find(attr => attr.attributeName === 'FSSAI Number')?.attributeValue || '--',
-          gstNumber: business.attributes.find(attr => attr.attributeName === 'GST Number')?.attributeValue || '--',
+          fssaiNumber: business.attributes.find(attr => attr.attributeName === 'FSSAINumber')?.attributeValue || '--',
+          gstNumber: business.attributes.find(attr => attr.attributeName === 'GSTNumber')?.attributeValue || '--',
           primaryContact: business.userDTO.primaryContact || '--',
           enabled: business.enabled
         }));
         this.totalItems = response.status.totalElements;
       },
       error: () => {
+        this.tokenService.hide();
         this.snackBar.open('Error loading businesses', 'Close', { duration: 3000 });
       }
     });
@@ -91,11 +95,16 @@ export class DisableRetaurantComponent implements OnInit{
         this.loadBusinesses(); 
       },
       error: (error) => {
+        this.tokenService.hide();
         console.error('Error updating business status:', error); 
         this.snackBar.open(`Failed to ${enabled ? 'enable' : 'disable'} business ${business.name}`, 'Close', { duration: 3000 });
         business.enabled = previousState;
       }
     });
+  }
+
+  navigateToReports(id: number | string) {
+    this.route.navigate(['/adminScreen/adminLayout/reports', id])
   }
   
 }

@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { MenuManagementService } from '../../../menuManagementService/menu-management.service';
+import { Component, inject } from '@angular/core';
+import { MenuManagementService } from '../../../menu-management/menuManagementService/menu-management.service';
+import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
@@ -7,7 +9,7 @@ import { MenuManagementService } from '../../../menuManagementService/menu-manag
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss'
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent {
   periodType: string = 'DAILY'; 
   fromDate: string = '';
   toDate: string = '';
@@ -20,7 +22,7 @@ export class ReportsComponent implements OnInit {
   totalPages: number = 0;
   isDownloading: boolean = false;
   loading: boolean = false;
-
+  restaurantId: string | number = '';
   deliveryOrderStatuses = [
     { value: 'ALL_ORDERS', label: 'All Orders' },
     { value: 'PLACED', label: 'Placed' },
@@ -44,7 +46,17 @@ export class ReportsComponent implements OnInit {
     { heading: 'Payment', data: 'paymentType' }
   ];
 
-  constructor(private orderService: MenuManagementService) { }
+   private paramRoute = inject(ActivatedRoute);
+   private destroy$ = new Subject<void>();
+
+  constructor(private orderService: MenuManagementService) { 
+     this.paramRoute.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.restaurantId = id;
+      }
+    });
+  }
 
   ngOnInit() {
     // Delivery-only: ensure statuses set correctly
@@ -148,7 +160,7 @@ export class ReportsComponent implements OnInit {
     const params: any = {
       status: this.orderStatus === 'ALL_ORDERS' ? '' : this.orderStatus,
       orderType: 'DELIVERY',
-      businessId: localStorage.getItem('restaurantId') || 'defaultBusinessId',
+      businessId: this.restaurantId,
       page: this.currentPage,
       size: this.pageSize,
     };

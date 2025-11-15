@@ -1,8 +1,67 @@
-<div class="layout-container">
-    <lib-hlt-side-nav [logoTitle]="'Eato Admin'" [navItems]="navItems"></lib-hlt-side-nav>
-    <div class="main-content">
-      <lib-hlt-top-nav [topNavItems]="topNavItems"></lib-hlt-top-nav>
-        <router-outlet/>
+<div class="layoutMain">
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="app-name">
+      <img
+        src="assets/images/localbasketlogo.png"
+        width="30"
+        height="30"
+        alt="logo"
+        style="border-radius: 15%"
+      />
+      Local Basket
+    </div>
+
+    <div
+      class="restaurant-info btn btn-light d-flex align-items-center shadow-sm"
+    >
+      <mat-icon
+        class="me-3 cursor-pointer"
+      >
+        notifications
+      </mat-icon>
+
+      <div class="profile-section d-flex align-items-center">
+        <mat-icon class="me-2 text-primary">person_pin_circle</mat-icon>
+        <span class="restaurant-name fw-medium me-1">Local Basket Admin</span>
+      </div>
     </div>
   </div>
-  
+</nav>
+
+
+  <div class="layout-container" [ngClass]="{'panel-open': isPanelOpen}">
+    <div class="card">
+      <div class="sideNav-header d-flex justify-content-start p-1 m-3 gap-3 align-items-center">
+        <div class="restaurant-logo">
+          <mat-icon class="restaurantIcon">restaurant</mat-icon>
+        </div>
+        <div class="restaurantName">
+          <p>Local Basket Admin</p>
+        </div>
+      </div>
+      <ul class="list">
+        <li class="element" routerLink="/adminScreen/adminLayout/aproveRequests" routerLinkActive="active">
+          <mat-icon>restaurant_menu</mat-icon>
+          <p class="label">Approval Requests</p>
+        </li>
+        <li class="element" routerLink="/adminScreen/adminLayout/disableRestaurant" routerLinkActive="active">
+          <mat-icon>restaurant_menu</mat-icon>
+          <p class="label">All Restaurant</p>
+        </li>
+        <li class="element" routerLink="/adminScreen/adminLayout/category" routerLinkActive="active">
+          <mat-icon>restaurant</mat-icon>
+          <p class="label">Categories</p>
+        </li>
+        <li class="element" (click)="logOut()">
+          <mat-icon>exit_to_app</mat-icon>
+          <p class="label">LogOut</p>
+        </li>
+      </ul>
+    </div>
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+

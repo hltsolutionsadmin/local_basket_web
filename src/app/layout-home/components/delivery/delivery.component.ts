@@ -62,6 +62,13 @@ export class DeliveryComponent implements OnInit, OnDestroy {
           ),
         error: () => this.handleFetchOrdersError(),
       });
+
+    // Refresh the delivery list whenever any component updates an order status
+    this.pollingService.orderStatusUpdated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.fetchOrders(this.currentPageIndex, this.selectedOrder?.id || undefined);
+      });
   }
 
   ngOnDestroy(): void {
@@ -229,6 +236,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             this.snackBar.open('Order accepted successfully', 'Close', {
               duration: 3000,
             });
+            this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'PREPARING' });
           } else {
             this.snackBar.open('Failed to approve order', 'Close', {
               duration: 3000,
@@ -286,6 +294,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
                 this.snackBar.open('Order rejected successfully', 'Close', {
                   duration: 3000,
                 });
+                this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'REJECTED' });
                 this.fetchOrders(this.currentPageIndex);
                 if (this.selectedOrder?.id === order.id)
                   this.closeOrderDetailsPanel();
@@ -309,6 +318,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             this.snackBar.open('Order status updated to PREPARING', 'Close', {
               duration: 3000,
             });
+            this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'PREPARING' });
             this.fetchOrders(this.currentPageIndex, this.selectedOrder?.id);
           } else {
             this.snackBar.open('Failed to update order status', 'Close', {
@@ -333,6 +343,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             this.snackBar.open('Order marked as Out for Delivery', 'Close', {
               duration: 3000,
             });
+            this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'OUT_FOR_DELIVERY' });
             this.fetchOrders(this.currentPageIndex, this.selectedOrder?.id);
           } else {
             this.snackBar.open('Failed to update order status', 'Close', {
@@ -359,6 +370,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             this.snackBar.open('Order marked as Ready for Pickup', 'Close', {
               duration: 3000,
             });
+            this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'READY_FOR_PICKUP' });
             this.fetchOrders(this.currentPageIndex, this.selectedOrder?.id);
           } else {
             this.snackBar.open('Failed to update order status', 'Close', {

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Category } from '../models/interface.model';
 import { ApiConfigService } from '../../core/service/api-config.service';
@@ -78,9 +78,7 @@ export class MenuManagementService {
     //   queryParams = queryParams.set('orderType', params.orderType);
     // }
 
-    const url = orderType === 'DINE_IN' 
-      ? this.apiConfig.getEndpoint('reportDinin') 
-      : this.apiConfig.getEndpoint('reportDelivery');
+    const url = this.apiConfig.getEndpoint('reportDelivery');
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -103,9 +101,7 @@ export class MenuManagementService {
     //   queryParams = queryParams.set('orderType', params.orderType);
     // }
 
-    const url = orderType === 'DINE_IN' 
-      ? this.apiConfig.getEndpoint('reportDininExcel') 
-      : this.apiConfig.getEndpoint('reportDeliveryExcel');
+    const url = this.apiConfig.getEndpoint('reportDeliveryExcel');
     return this.http.get(url, { responseType: 'blob', params: queryParams });
   }
 
@@ -129,35 +125,5 @@ export class MenuManagementService {
       params: httpParams,
       responseType: 'blob'
     });
-  }
-
-  getCaptains(): Observable<any[]> {
-    const getAllCaptainsUrl = this.apiConfig.getEndpoint('getAllCaptains');
-    return this.http.get<any[]>(getAllCaptainsUrl);
-  }
-
-  private captainListUpdate = new Subject<void>();
-
-   onboardCaptain(payload: any): Observable<number> {
-    const addCaptainsUrl = this.apiConfig.getEndpoint('addCaptains');
-    return this.http.post<number>(addCaptainsUrl, payload);
-  }
-
-  addPermissions(userId: number, permissions: string[]): Observable<void> {
-    const addPermissionsUrl = this.apiConfig.getEndpoint('addPermissions');
-    return this.http.post<void>(`${addPermissionsUrl}?userId=${userId}`, permissions);
-  }
-
-  removePermissions(userId: number, permissions: string[]): Observable<void> {
-    const removePermissionsUrl = this.apiConfig.getEndpoint('removePermissions');
-    return this.http.delete<void>(`${removePermissionsUrl}?userId=${userId}`, { body: permissions });
-  }
-
-  notifyCaptainListUpdate(): void {
-    this.captainListUpdate.next();
-  }
-
-  getCaptainListUpdate(): Observable<void> {
-    return this.captainListUpdate.asObservable();
   }
 }

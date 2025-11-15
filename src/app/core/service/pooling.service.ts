@@ -22,6 +22,9 @@ export class PoolingService {
   private placedOrdersSubject = new BehaviorSubject<Order[]>([]);
   placedOrders$ = this.placedOrdersSubject.asObservable();
 
+  private orderStatusUpdatedSubject = new Subject<{ orderNumber: string; status: string }>();
+  orderStatusUpdated$ = this.orderStatusUpdatedSubject.asObservable();
+
   // Buzzer audio references to allow immediate stop
   private buzzers: HTMLAudioElement[] = [];
 
@@ -80,6 +83,10 @@ export class PoolingService {
     this.newOrderSubject.next(order);
     // 🔔 Play buzzer sound and keep references for immediate stop
     this.playBuzzer();
+  }
+
+  notifyOrderStatusUpdated(update: { orderNumber: string; status: string }): void {
+    this.orderStatusUpdatedSubject.next(update);
   }
 
   private playBuzzer(): void {

@@ -7,8 +7,10 @@ import { HLTReusableLibModule } from 'hlt-reusable-lib';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DisableRetaurantComponent } from './components/disable-retaurant/disable-retaurant.component';
 import { CategorysComponent } from './components/categorys/categorys.component';
-import { AddCategoryComponent } from './components/popupScreens/add-category/add-category.component';
+import { AddCategoryComponent } from './components/categorys/add-category/add-category.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ReportsComponent } from './components/reports/reports.component';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -17,7 +19,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     AdminLayoutComponent,
     DisableRetaurantComponent,
     CategorysComponent,
-    AddCategoryComponent
+    AddCategoryComponent,
+    ReportsComponent
   ],
   imports: [
     CommonModule,
@@ -25,6 +28,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     HLTReusableLibModule,
     MatTooltipModule,
     MatDialogModule,
+    RouterModule
   ]
 })
 export class AdminScreenModule { }
