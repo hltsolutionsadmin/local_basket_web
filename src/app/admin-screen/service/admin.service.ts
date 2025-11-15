@@ -96,17 +96,17 @@ export class AdminService {
   }
 
    getCategories(): Observable<Category[]> {
-    const getCategoriesUrl = this.apiConfig.getEndpoint('getCategorys');
-    return this.http.get<Category[]>(getCategoriesUrl);
+    const getCategoriesUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.get<Category[]>(`${getCategoriesUrl}/categories`);
   }
 
    createCategory(formData: FormData): Observable<any> {
-    const createCategoryUrl = this.apiConfig.getEndpoint('createCategory');
-    return this.http.post(createCategoryUrl, formData);
+    const createCategoryUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.post(`${createCategoryUrl}/api/products/create`, formData);
   }
 
   deleteCategory(id: number): Observable<any> {
-    const deleteCategoryUrl = this.apiConfig.getEndpoint('deleteItem');
-    return this.http.delete(`${deleteCategoryUrl}${id}`);
+    const deleteCategoryUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
+    return this.http.delete(`${deleteCategoryUrl}/categories/${id}`);
   }
 }

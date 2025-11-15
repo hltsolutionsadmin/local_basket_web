@@ -109,4 +109,20 @@ getBusinessDetails(restaurantId: string | number): Observable<any> {
       })
     );
   }
+
+  updateBusinessTimings(params: { id: string | number; loginTime?: string; logoutTime?: string; }): Observable<any> {
+    const baseUrl = this.apiConfig.getEndpoint('BusinessEndpoint');
+    let body = new HttpParams().set('id', String(params.id));
+    if (params.loginTime) body = body.set('loginTime', params.loginTime);
+    if (params.logoutTime) body = body.set('logoutTime', params.logoutTime);
+
+    return this.http.put(`${baseUrl}/timings`, body.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }).pipe(
+      catchError((error) => {
+        console.error('Failed to update business timings', error);
+        return throwError(() => new Error('Unable to update business timings.'));
+      })
+    );
+  }
 }

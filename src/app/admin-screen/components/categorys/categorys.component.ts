@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { AdminService } from '../../service/admin.service';
-import { AddCategoryComponent } from '../popupScreens/add-category/add-category.component';
+import { AddCategoryComponent } from './add-category/add-category.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../core/components/confirm-dialog/confirm-dialog.component';
 import { finalize } from 'rxjs';
@@ -45,6 +45,7 @@ export class CategorysComponent implements OnInit {
         this.categories = data;
       },
       error: (error) => {
+        this.tokenService.hide();
         console.error('Error fetching categories:', error);
       }
     });
@@ -81,6 +82,7 @@ export class CategorysComponent implements OnInit {
             this.loadCategories(); // Refresh categories
           },
           error: (error) => {
+            this.tokenService.hide();
             console.error('Error creating category:', error);
           }
         });
@@ -109,6 +111,7 @@ export class CategorysComponent implements OnInit {
             this.loadCategories(); // Refresh categories
           },
           error: (error) => {
+            this.tokenService.hide();
             console.error('Error deleting category:', error);
           }
         });

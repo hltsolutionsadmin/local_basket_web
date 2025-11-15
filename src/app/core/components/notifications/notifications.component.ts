@@ -56,6 +56,17 @@ export class NotificationsComponent implements OnInit {
     if (this.businessId) {
       this.loadInitialPlacedOrders();
       this.subscribeToNewOrders();
+      // Keep notification list in sync with updates coming from other components
+      this.pollingService.orderStatusUpdated$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(({ orderNumber, status }) => {
+          const order = this.orders.find(o => o.orderNumber === orderNumber);
+          if (!order) return;
+          // Remove from notifications when status changes away from PLACED
+          if (status !== 'PLACED') {
+            this.removeOrderFromNotificationList(order.id);
+          }
+        });
     }
   }
 
@@ -150,6 +161,7 @@ export class NotificationsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.snackBar.open('Order accepted successfully', 'Close', { duration: 3000 });
+          this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'PREPARING' });
           this.removeOrderFromNotificationList(order.id);
         },
         error: (error: any) => {
@@ -166,7 +178,9 @@ export class NotificationsComponent implements OnInit {
     this.orderService.updateOrderStatus(order.orderNumber, 'READY_FOR_PICKUP', '0', '').pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.isLoading = false;
           this.snackBar.open('Order marked as ready for pickup', 'Close', { duration: 3000 });
+          this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'READY_FOR_PICKUP' });
           this.removeOrderFromNotificationList(order.id);
         },
         error: (error: any) => {
@@ -194,6 +208,7 @@ export class NotificationsComponent implements OnInit {
             .subscribe({
               next: () => {
                 this.snackBar.open('Order rejected successfully', 'Close', { duration: 3000 });
+                this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'REJECTED' });
                 this.removeOrderFromNotificationList(order.id);
               },
               error: () => this.snackBar.open('Failed to reject order', 'Close', { duration: 3000 }),

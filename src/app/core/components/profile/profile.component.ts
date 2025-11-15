@@ -6,6 +6,7 @@ import { TokenService } from '../../service/token.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BusinessDetails } from '../../interface/eatoInterface';
 import { Attribute } from '../../../auth/model/interface.auth';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -114,60 +115,64 @@ export class ProfileComponent implements OnInit{
     const fd = new FormData();
     fd.append('id', String(this.restaurantId));
 
-    let idx = 0;
+    // Track which sets of fields were edited
+    let attrIdx = 0;
     const gstCtrl = this.form.get('gstNumber');
-    if (!this.gstReadOnly && gstCtrl?.dirty) {
+    const editedGst = !this.gstReadOnly && !!gstCtrl?.dirty && !!(formValue.gstNumber || '').toString().trim();
+    if (editedGst) {
       const v = (formValue.gstNumber || '').toString().trim();
-      if (v) {
-        fd.append(`attributes[${idx}].attributeName`, 'GSTNumber');
-        fd.append(`attributes[${idx}].attributeValue`, v);
-        idx++;
-      }
+      fd.append(`attributes[${attrIdx}].attributeName`, 'GSTNumber');
+      fd.append(`attributes[${attrIdx}].attributeValue`, v);
+      attrIdx++;
     }
 
     const fssaiCtrl = this.form.get('fssaiNumber');
-    if (!this.fssaiReadOnly && fssaiCtrl?.dirty) {
+    const editedFssai = !this.fssaiReadOnly && !!fssaiCtrl?.dirty && !!(formValue.fssaiNumber || '').toString().trim();
+    if (editedFssai) {
       const v = (formValue.fssaiNumber || '').toString().trim();
-      if (v) {
-        fd.append(`attributes[${idx}].attributeName`, 'FSSAINumber');
-        fd.append(`attributes[${idx}].attributeValue`, v);
-        idx++;
-      }
+      fd.append(`attributes[${attrIdx}].attributeName`, 'FSSAINumber');
+      fd.append(`attributes[${attrIdx}].attributeValue`, v);
+      attrIdx++;
     }
 
     const openCtrl = this.form.get('openingTime');
-    if (openCtrl?.dirty) {
-      const v = (formValue.openingTime || '').toString().trim();
-      if (v) {
-        fd.append(`attributes[${idx}].attributeName`, 'loginTime');
-        fd.append(`attributes[${idx}].attributeValue`, v);
-        idx++;
-      }
-    }
-
     const closeCtrl = this.form.get('closingTime');
-    if (closeCtrl?.dirty) {
-      const v = (formValue.closingTime || '').toString().trim();
-      if (v) {
-        fd.append(`attributes[${idx}].attributeName`, 'logoutTime');
-        fd.append(`attributes[${idx}].attributeValue`, v);
-        idx++;
-      }
-    }
+    const editedLogin = !!openCtrl?.dirty && !!(formValue.openingTime || '').toString().trim();
+    const editedLogout = !!closeCtrl?.dirty && !!(formValue.closingTime || '').toString().trim();
 
-    if (idx === 0) {
+    const needUpsert = attrIdx > 0;
+    const needTimings = editedLogin || editedLogout;
+
+    if (!needUpsert && !needTimings) {
       this.saving = false;
       this.snackBar.open('No changes to save', 'Close', { duration: 2500 });
       return;
     }
 
-    this.tokenService.upsertBusiness(fd).subscribe({
+    const calls = [] as any[];
+    if (needUpsert) {
+      calls.push(this.tokenService.upsertBusiness(fd));
+    }
+    if (needTimings) {
+      calls.push(
+        this.tokenService.updateBusinessTimings({
+          id: this.restaurantId,
+          // Always send both values when any timing is edited
+          loginTime: (formValue.openingTime || '').toString().trim(),
+          logoutTime: (formValue.closingTime || '').toString().trim(),
+        })
+      );
+    }
+
+    const request$ = calls.length === 1 ? calls[0] : forkJoin(calls);
+
+    request$.subscribe({
       next: () => {
         this.snackBar.open('Settings saved successfully', 'Close', { duration: 3000 });
         this.loadBusinessDetails();
         this.saving = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to save settings', err);
         this.snackBar.open('Failed to save settings', 'Close', { duration: 4000, panelClass: ['snack-error'] });
         this.saving = false;

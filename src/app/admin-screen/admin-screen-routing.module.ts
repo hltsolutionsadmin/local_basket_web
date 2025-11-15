@@ -4,6 +4,7 @@ import { AdminLayoutComponent } from './components/admin-layout/admin-layout.com
 import { ApproveRequestComponent } from './components/approve-request/approve-request.component';
 import { DisableRetaurantComponent } from './components/disable-retaurant/disable-retaurant.component';
 import { CategorysComponent } from './components/categorys/categorys.component';
+import { ReportsComponent } from './components/reports/reports.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
        {
         path: 'category',
         component: CategorysComponent
+      },
+       {
+        path: 'reports/:id',
+        component: ReportsComponent
       }
     ]
   }
