@@ -101,14 +101,14 @@ export class PoolingService {
       });
       this.buzzers.push(audio);
 
-      const audio1 = new Audio('assets/audio/buzzer-227217.mp3');
+      const audio1 = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
       audio1.volume = 0.8;
       audio1.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);
       });
       this.buzzers.push(audio1);
 
-      const audio2 = new Audio('assets/audio/buzzer-227217.mp3');
+      const audio2 = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
       audio2.volume = 1.0;
       audio2.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);

@@ -11,6 +11,9 @@ import { AddCategoryComponent } from './components/categorys/add-category/add-ca
 import { MatDialogModule } from '@angular/material/dialog';
 import { ReportsComponent } from './components/reports/reports.component';
 import { RouterModule } from '@angular/router';
+import { DeliveryReportsComponent } from './components/reports/delivery-reports/delivery-reports.component';
+import { ComplaintsComponent } from './components/complaints/complaints.component';
+import { DeliveryPartnersComponent } from './delivery-partners/delivery-partners.component';
 
 
 @NgModule({
@@ -20,7 +23,10 @@ import { RouterModule } from '@angular/router';
     DisableRetaurantComponent,
     CategorysComponent,
     AddCategoryComponent,
-    ReportsComponent
+    ReportsComponent,
+    ComplaintsComponent,
+    DeliveryPartnersComponent,
+    DeliveryReportsComponent
   ],
   imports: [
     CommonModule,

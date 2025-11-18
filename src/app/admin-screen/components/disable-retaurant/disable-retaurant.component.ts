@@ -106,5 +106,9 @@ export class DisableRetaurantComponent implements OnInit{
   navigateToReports(id: number | string) {
     this.route.navigate(['/adminScreen/adminLayout/reports', id])
   }
+
+  navigateToComplaints(id: number | string) {
+    this.route.navigate(['/adminScreen/adminLayout/complaints', id])
+  }
   
 }

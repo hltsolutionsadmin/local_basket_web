@@ -1,0 +1,143 @@
+<div class="reports-page-container">
+  <div class="filter-section card p-3">
+    <form (ngSubmit)="onSearch()" class="d-flex align-items-end flex-wrap gap-3">
+      <div class="form-group flex-fill">
+        <label for="periodType" class="form-label">Select Period</label>
+        <div class="position-relative d-inline-block w-100">
+          <select id="periodType" [(ngModel)]="periodType" name="periodType" (change)="updateDateRange()"
+            class="form-select custom-select-control">
+            <option value="NONE">None</option>
+            <option value="MONTHLY">MONTHLY</option>
+            <option value="ANNUALLY">ANNUALLY</option>
+            <option value="DAILY">DAILY</option>
+            <option value="QUARTERLY">QUARTERLY</option>
+          </select>
+          <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="fromDate" class="form-label">Date Range</label>
+        <div class="position-relative d-inline-block w-100">
+          <input type="date" id="fromDate" [(ngModel)]="fromDate" name="fromDate" required
+            class="form-control custom-date-control">
+          <mat-icon class="calendar-icon">calendar_month</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="toDate" class="form-label invisible-label">To Date</label>
+        <div class="position-relative d-inline-block w-100">
+          <input type="date" id="toDate" [(ngModel)]="toDate" name="toDate" required
+            class="form-control custom-date-control">
+          <mat-icon class="calendar-icon">calendar_month</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-group flex-fill">
+        <label for="orderStatus" class="form-label">Order Status</label>
+        <div class="position-relative d-inline-block">
+          <select id="orderStatus" [(ngModel)]="orderStatus" name="orderStatus" required
+            class="form-select custom-select-control">
+            <option *ngFor="let status of availableOrderStatuses" [value]="status.value">{{ status.label }}</option>
+          </select>
+          <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn search-button" [disabled]="!canSearch()">
+          <mat-icon class="button-icon">search</mat-icon>
+        </button>
+        <button type="button" class="btn download-button" (click)="downloadExcel()"
+          [disabled]="!fromDate || !toDate || isDownloading">
+          <mat-icon class="button-icon">download</mat-icon> {{ isDownloading ? '...' : 'Excel' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-section card">
+    <div class="table-responsive">
+      <table class="table custom-table">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">ORDER ID</th>
+            <th scope="col">DATE</th>
+            <th scope="col">TIME</th>
+            <th scope="col">ORDER TYPE</th>
+            <th scope="col">TOTAL AMOUNT</th>
+            <th scope="col">STATUS</th>
+            <th scope="col">PAYMENT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="loading">
+            <td [attr.colspan]="7" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Loading Orders...</p>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && orders.length === 0">
+            <td [attr.colspan]="7" class="text-center py-4">
+              No orders found for the selected criteria.
+            </td>
+          </tr>
+          <tr *ngFor="let order of orders" class="table-row">
+            <td>{{ order.orderNumber }}</td>
+            <td>{{ order.createdDate }}</td>
+            <td>{{ order.createdTime }}</td>
+            <td>
+              <span [ngClass]="{
+                  'order-type-tag': true,
+                  'order-type-dine-in': order.orderType === 'DINE_IN',
+                  'order-type-delivery': order.orderType === 'DELIVERY',
+                  'order-type-takeaway': order.orderType === 'TAKEAWAY'
+                }">
+                <mat-icon *ngIf="order.orderType === 'DINE_IN'" class="order-type-icon">table_bar</mat-icon>
+                <mat-icon *ngIf="order.orderType === 'DELIVERY'" class="order-type-icon">delivery_dining</mat-icon>
+                <mat-icon *ngIf="order.orderType === 'TAKEAWAY'" class="order-type-icon">local_mall</mat-icon>
+                {{ order.orderType | titlecase }}
+              </span>
+            </td>
+            <td>{{ order.totalAmount }}</td>
+            <td>
+              <span [ngClass]="{
+                  'status-tag': true,
+                  'status-completed': order.orderStatus === 'DELIVERED' || order.orderStatus === 'COMPLETED',
+                  'status-pending': order.orderStatus === 'PLACED' || order.orderStatus === 'ACCEPTED' || order.orderStatus === 'CONFIRMED' || order.orderStatus === 'PREPARING' || order.orderStatus === 'READY_FOR_PICKUP' || order.orderStatus === 'OUT_FOR_DELIVERY' || order.orderStatus === 'PENDING' || order.orderStatus === 'IN_PROGRESS' || order.orderStatus === 'LIVE',
+                  'status-cancelled': order.orderStatus === 'CANCELLED' || order.orderStatus === 'REJECTED'
+                }">
+                {{ order.orderStatus | titlecase }}
+              </span>
+            </td>
+            <td>{{ order.paymentType }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="totalItems > 0" class="pagination-container">
+      <span class="pagination-info">Showing {{ (currentPage * pageSize) + 1 }} to {{ (currentPage + 1) * pageSize > totalItems ? totalItems : (currentPage + 1) * pageSize }} of {{ totalItems }} results</span>
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" (click)="onPageChange(0)" aria-label="First">«</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === 0">
+          <a class="page-link" (click)="onPageChange(currentPage - 1)" aria-label="Previous">‹</a>
+        </li>
+        <li class="page-item" *ngFor="let pageNum of getPagesArray()" [class.active]="pageNum === currentPage">
+          <a class="page-link" (click)="onPageChange(pageNum)">{{ pageNum + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= (totalPages - 1)">
+          <a class="page-link" (click)="onPageChange(currentPage + 1)" aria-label="Next">›</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= (totalPages - 1)">
+          <a class="page-link" (click)="onPageChange(totalPages - 1)" aria-label="Last">»</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -66,6 +66,52 @@ interface Category {
   media: Media[];
 }
 
+
+export interface DeliveryReportResponse {
+  message: string;
+  status: string;
+  data: {
+    periodLabel: string;
+    assignedCount: number;
+    deliveredCount: number;
+    pendingCount: number;
+    totalAmount: number;
+    averageAmountPerDeliveredRide: number;
+  }[];
+}
+
+export interface getDeliveryPartnersResponse {
+  id: number
+  fullName: string
+  username: string
+  email: string
+  roles: Role[]
+  primaryContact: string
+  version: number
+  skillrat: boolean
+  yardly: boolean
+  eato: boolean
+  sancharalakshmi: boolean
+  deliveryPartner: boolean
+  b2bUnit: B2bUnit
+  password: string
+  permission: any[]
+  registered: boolean
+}
+
+export interface Role {
+  name: string
+  id: number
+}
+
+export interface B2bUnit {
+  id: number
+  businessName: string
+  approved: boolean
+  enabled: boolean
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -108,5 +154,31 @@ export class AdminService {
   deleteCategory(id: number): Observable<any> {
     const deleteCategoryUrl = this.apiConfig.getEndpoint('CategorysEndpoint');
     return this.http.delete(`${deleteCategoryUrl}/categories/${id}`);
+  }
+
+  getDeliveryPartners(): Observable<getDeliveryPartnersResponse[]> {
+    const baseUrl = this.apiConfig.getEndpoint('UserEndpoint') || '';
+    return this.http.get<getDeliveryPartnersResponse[]>(`${baseUrl}/byRole?roleName=ROLE_DELIVERY_PARTNER`);
+  }
+
+  getDeliveryReports(params: {
+    frequency: string;
+    from: string;
+    to: string;
+    format: 'json' | 'excel';
+    partnerUserId: number;
+  }): Observable<DeliveryReportResponse> {
+    const baseUrl = this.apiConfig.getEndpoint('deliveryReportsEndPoint') || '';
+    const queryParams = new URLSearchParams({
+      frequency: params.frequency.toLowerCase(),
+      from: params.from,
+      to: params.to,
+      format: params.format,
+      partnerUserId: params.partnerUserId.toString()
+    }).toString();
+
+    return this.http.get<DeliveryReportResponse>(
+      `${baseUrl}/reports?${queryParams}`
+    );
   }
 }

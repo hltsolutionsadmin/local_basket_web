@@ -46,12 +46,12 @@ export class LayoutHomeService {
     return this.http.get(url);
   }
 
-  updateOrderStatus(orderNumber: string, status: string, notes: string, updatedBy: string): Observable<any> {
+  updateOrderStatus(orderNumber: string, status: string, notes: any, updatedBy: string): Observable<any> {
     const updateOrderStatusUrl = this.apiConfig.getEndpoint('OrderEndpoint');
     const body = new HttpParams()
       .set('status', status)
-      .set('notes', notes.trim() || '')
-      .set('updatedBy', updatedBy.trim() || '');
+      .set('notes', notes)
+      .set('updatedBy', updatedBy);
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
     return this.http.post(`${updateOrderStatusUrl}/api/orders/status/${orderNumber}`, body.toString(), { headers }).pipe(
       catchError(error => {

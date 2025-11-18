@@ -270,6 +270,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   }
 
   rejectOrder(order: Order, notes: string, updatedBy: string): void {
+    debugger;
     this.dialog
       .open(OrderActionComponent, {
         width: '400px',
@@ -285,8 +286,8 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             .updateOrderStatus(
               order.orderNumber,
               'REJECTED',
-              result.notes,
-              result.updatedBy
+              0,
+              result.notes
             )
             .pipe(takeUntil(this.destroy$))
             .subscribe({

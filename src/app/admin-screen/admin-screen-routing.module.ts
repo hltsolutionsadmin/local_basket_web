@@ -5,6 +5,8 @@ import { ApproveRequestComponent } from './components/approve-request/approve-re
 import { DisableRetaurantComponent } from './components/disable-retaurant/disable-retaurant.component';
 import { CategorysComponent } from './components/categorys/categorys.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { DeliveryReportsComponent } from './components/reports/delivery-reports/delivery-reports.component';
+import { ComplaintsComponent } from './components/complaints/complaints.component';
 
 const routes: Routes = [
   {
@@ -34,8 +36,20 @@ const routes: Routes = [
         component: CategorysComponent
       },
        {
+        path: 'category',
+        component: CategorysComponent
+      },
+       {
+        path: 'deliveryPartners',
+        component: DeliveryReportsComponent
+      },
+       {
         path: 'reports/:id',
         component: ReportsComponent
+      },
+       {
+        path: 'complaints/:id',
+        component: ComplaintsComponent
       }
     ]
   }
