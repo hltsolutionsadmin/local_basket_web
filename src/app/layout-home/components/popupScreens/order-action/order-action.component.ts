@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrl: './order-action.component.scss'
 })
 export class OrderActionComponent {
-  actionForm: FormGroup;
+   actionForm: FormGroup;
   
   constructor(
     public dialogRef: MatDialogRef<OrderActionComponent>,
@@ -17,7 +17,7 @@ export class OrderActionComponent {
   ) {
     this.actionForm = new FormGroup({
       // Use form controls directly to handle value changes
-      // notes: new FormControl('', Validators.required),
+      notes: new FormControl('', Validators.required),
       updatedBy: new FormControl('')
     });
   }
@@ -26,10 +26,10 @@ export class OrderActionComponent {
     this.actionForm.get('notes')?.setValue(value.trim());
   }
 
- updateUpdatedBy(value: any) {
-  const text = typeof value === 'string' ? value.trim() : '';
-  this.actionForm.get('updatedBy')?.setValue(text);
-}
+  // Same as updateNotes, this method updates the form control value
+  updateUpdatedBy(value: string) {
+    this.actionForm.get('updatedBy')?.setValue(value.trim());
+  }
 
   onCancel(): void {
     this.dialogRef.close();

@@ -13,7 +13,8 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { RouterModule } from '@angular/router';
 import { DeliveryReportsComponent } from './components/reports/delivery-reports/delivery-reports.component';
 import { ComplaintsComponent } from './components/complaints/complaints.component';
-import { DeliveryPartnersComponent } from './delivery-partners/delivery-partners.component';
+import { DeliveryReportsModelComponent } from './components/reports/delivery-reports/delivery-reports-model/delivery-reports-model.component';
+import { MatNativeDateModule } from '@angular/material/core';
 
 
 @NgModule({
@@ -25,8 +26,8 @@ import { DeliveryPartnersComponent } from './delivery-partners/delivery-partners
     AddCategoryComponent,
     ReportsComponent,
     ComplaintsComponent,
-    DeliveryPartnersComponent,
-    DeliveryReportsComponent
+    DeliveryReportsComponent,
+    DeliveryReportsModelComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +35,8 @@ import { DeliveryPartnersComponent } from './delivery-partners/delivery-partners
     HLTReusableLibModule,
     MatTooltipModule,
     MatDialogModule,
-    RouterModule
+    RouterModule,
+    MatNativeDateModule
   ]
 })
 export class AdminScreenModule { }

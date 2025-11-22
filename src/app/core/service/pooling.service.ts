@@ -39,7 +39,7 @@ export class PoolingService {
       return;
     }
 
-    const pollingInterval = 10000; // 10 seconds
+    const pollingInterval = 4000; // 4 seconds
 
     this.pollingSub = interval(pollingInterval).subscribe(() => {
       // 🔹 Fetch PLACED orders
@@ -94,26 +94,12 @@ export class PoolingService {
       // Ensure any existing buzzers are stopped before starting new ones
       this.stopBuzzer();
 
-      const audio = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
+      const audio = new Audio('assets/audio/henSounds.mp3');
       audio.volume = 0.6;
       audio.play().catch((err) => {
         console.warn('Audio playback blocked or unavailable:', err);
       });
       this.buzzers.push(audio);
-
-      const audio1 = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
-      audio1.volume = 0.8;
-      audio1.play().catch((err) => {
-        console.warn('Audio playback blocked or unavailable:', err);
-      });
-      this.buzzers.push(audio1);
-
-      const audio2 = new Audio('assets/audio/sound-effect-old-phone-191761.mp3');
-      audio2.volume = 1.0;
-      audio2.play().catch((err) => {
-        console.warn('Audio playback blocked or unavailable:', err);
-      });
-      this.buzzers.push(audio2);
     } catch (error) {
       console.error('Error playing buzzer sound:', error);
     }

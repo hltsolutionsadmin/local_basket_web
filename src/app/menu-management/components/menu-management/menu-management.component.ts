@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef,Component,inject,OnDestroy,OnInit } from '@angular/core';
 import { MenuManagementService } from '../../menuManagementService/menu-management.service';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
@@ -232,7 +232,7 @@ export class MenuManagementComponent implements OnInit , OnDestroy {
   private mapToItems(data: any[]): Items[] {
     return data.map(item => {
       const typeAttr = item.attributes?.find((a: any) => a.attributeName === 'type');
-      const onlinePriceAttr = item.attributes?.find((a: any) => a.attributeName === 'onlinePrice');
+      const onlinePriceAttr = item.attributes?.find((a: any) => a.attributeName === 'onlinePrice' || a.attributeName === 'OnlinePrice');
 
       return {
         id: item.id,
