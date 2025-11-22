@@ -43,7 +43,6 @@ export class NotificationsComponent implements OnInit {
   private hasLoadedInitialOrders = false;
 
   constructor(
-    private readonly router: Router,
     private readonly orderService: LayoutHomeService,
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog,
@@ -137,6 +136,7 @@ export class NotificationsComponent implements OnInit {
   }
 
   handleAcceptClick(order: OrderOnline): void {
+    debugger
     const actionDialogRef = this.dialog.open(OrderActionComponent, {
       width: '400px',
       data: { order, action: 'approve' },
@@ -203,7 +203,7 @@ export class NotificationsComponent implements OnInit {
           // Stop buzzer immediately on reject
           this.pollingService.stopBuzzer();
           this.orderService
-            .updateOrderStatus(order.orderNumber, 'REJECTED', result.notes, result.updatedBy)
+            .updateOrderStatus(order.orderNumber, 'REJECTED', '0', result.updatedBy)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
               next: () => {

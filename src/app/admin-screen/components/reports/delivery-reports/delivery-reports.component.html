@@ -1,0 +1,63 @@
+<div class="orders-list">
+  <div class="top-bar">
+    <div class="Orders"><p class="m-0">Delivery Partners Reports</p></div>
+    <div class="search-section">
+      <input type="text" class="form-control" placeholder="Search partners...">
+      <button class="btn btn-primary filter-btn d-flex">
+        <mat-icon>filter_alt</mat-icon> Filter
+      </button>
+    </div>
+  </div>
+
+  <div class="grid-container">
+    <div class="order-card" 
+         *ngFor="let deliveryPartner of deliveryPartners"
+         [class.selected-card]="selectedPartner?.id === deliveryPartner.id">
+
+      <!-- Partner Info (always visible) -->
+      <div class="order-details-left">
+        <div class="order-header">
+          <span class="order-status-badge" style="background-color: green;">Online</span>
+          <span class="order-number" style="display: flex;">
+            <mat-icon style="font-size: 15px;">person</mat-icon>
+            {{ deliveryPartner.fullName }}
+          </span>
+        </div>
+        <div class="item-list">
+          <div class="item-row">
+            <mat-icon style="font-size: 15px;">email</mat-icon>
+            <span class="item-quantity">Email</span>
+            <span class="item-name">{{ deliveryPartner.email }}</span>
+          </div>
+          <div class="item-row">
+            <mat-icon style="font-size: 15px;">phone</mat-icon>
+            <span class="item-quantity">Mobile</span>
+            <span class="item-name">{{ deliveryPartner.primaryContact }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="action-buttons">
+        <button type="button" 
+                (click)="openReport(deliveryPartner)" 
+                class="btn btn-outline-primary btn-sm"> View Reports</button>
+
+        <!-- Optional: Close button when expanded -->
+        <button type="button" 
+                *ngIf="selectedPartner?.id === deliveryPartner.id"
+                (click)="selectedPartner = null" 
+                class="btn btn-outline-danger btn-sm ms-2">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Report Section - appears below the same card -->
+      <div class="w-100 mt-4" 
+           *ngIf="selectedPartner?.id === deliveryPartner.id">
+        <app-delivery-reports-model [partnerUserId]="deliveryPartner.id">
+        </app-delivery-reports-model>
+      </div>
+    </div>
+  </div>
+</div>

@@ -8,6 +8,7 @@
     "RestaurantEndpoint"         : "/restaurant",
     "OrderEndpoint"              : "/order",
     "reportDelivery"             : "/order/api/orders/user/filter",
-    "reportDeliveryExcel"        : "/order/api/orders/user/filter/excel"
+    "reportDeliveryExcel"        : "/order/api/orders/user/filter/excel",
+    "deliveryReportsEndPoint"    : "/delivery/api/partners"
   }
 }

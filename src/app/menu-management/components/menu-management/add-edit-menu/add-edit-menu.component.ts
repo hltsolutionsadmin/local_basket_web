@@ -1,11 +1,10 @@
-import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuManagementService } from '../../../menuManagementService/menu-management.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenService } from '../../../../core/service/token.service';
 import { Category, Items } from '../../../models/interface.model';
-import { finalize, Subscription } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-add-edit-menu',
@@ -86,7 +85,7 @@ export class AddEditMenuComponent implements OnInit , OnChanges {
 
   private populateForm(item: Items): void {
     const attributes = item.attributes || [];
-    const onlinePriceAttr = attributes.find(a => a.attributeName === 'onlinePrice');
+    const onlinePriceAttr = attributes.find(a => a.attributeName === 'onlinePrice' || a.attributeName === 'OnlinePrice');
     const typeAttr = attributes.find(a => a.attributeName === 'type');
 
     this.menuForm.patchValue({

@@ -1,0 +1,80 @@
+
+<div class="container-fluid complaints-page py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h5 class="mb-1">Customer Complaints</h5>
+      <p class="text-muted mb-0">All complaints raised for this restaurant</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="p-4 text-center text-muted">
+        Loading complaints...
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <div *ngIf="complaints.length === 0" class="p-4 text-center text-muted">
+          No complaints found for this restaurant.
+        </div>
+
+        <div *ngIf="complaints.length > 0" class="list-group list-group-flush">
+          <div class="list-group-item complaint-item" *ngFor="let c of complaints">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+              <div class="flex-grow-1">
+                <h6 class="mb-1 complaint-title">{{ c.title }}</h6>
+                <p class="mb-2 text-muted small">{{ c.description }}</p>
+
+                <div class="d-flex flex-wrap gap-3 small text-secondary">
+                  <div>
+                    <span class="fw-semibold">Created On:</span>
+                    <span>{{ formatDateTime(c.createdDt) }}</span>
+                  </div>
+                  <div>
+                    <span class="fw-semibold">Customer:</span>
+                    <span>{{ c.createdByName }}</span>
+                  </div>
+                  <div>
+                    <span class="fw-semibold">Mobile:</span>
+                    <span>{{ c.createdByMobile }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="text-end small text-uppercase status-pill"
+                [ngClass]="c.status.toLowerCase()"
+              >
+                {{ c.status }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="card-footer bg-white border-0" *ngIf="totalPages > 1">
+      <nav class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">
+          Showing page {{ currentPage + 1 }} of {{ totalPages }} ({{ totalElements }} complaints)
+        </span>
+        <ul class="pagination mb-0 pagination-sm">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <button class="page-link" (click)="onPageChange(currentPage - 1)">&laquo;</button>
+          </li>
+          <li
+            class="page-item"
+            *ngFor="let p of [].constructor(totalPages); let i = index"
+            [class.active]="i === currentPage"
+          >
+            <button class="page-link" (click)="onPageChange(i)">{{ i + 1 }}</button>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage >= totalPages - 1">
+            <button class="page-link" (click)="onPageChange(currentPage + 1)">&raquo;</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+

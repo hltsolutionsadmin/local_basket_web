@@ -1,0 +1,68 @@
+<div class="reports-page-container">
+  <div class="filter-section card p-4 mb-4">
+    <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="d-flex align-items-end flex-wrap gap-3">
+      <div class="form-group">
+        <label>Select Period</label>
+        <select class="form-select" formControlName="frequency">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>From Date</label>
+        <input type="date" class="form-control" formControlName="from">
+      </div>
+
+      <div class="form-group">
+        <label>To Date</label>
+        <input type="date" class="form-control" formControlName="to">
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <mat-icon>search</mat-icon> Search
+        </button>
+        <button type="button" class="btn btn-success" (click)="downloadExcel()">
+          <mat-icon>download</mat-icon> Excel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Report Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th>Period</th>
+            <th>Assigned</th>
+            <th>Delivered</th>
+            <th>Pending</th>
+            <th>Total Amount</th>
+            <th>Avg per Delivered Ride</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="reportData.length === 0">
+            <td colspan="6" class="text-center py-4 text-muted">
+              No data found for the selected period.
+            </td>
+          </tr>
+          <tr *ngFor="let row of reportData">
+            <td><strong>{{ row.periodLabel }}</strong></td>
+            <td>{{ row.assignedCount }}</td>
+            <td>{{ row.deliveredCount }}</td>
+            <td>{{ row.pendingCount }}</td>
+            <td>{{ row.totalAmount | currency:'INR':'symbol':'1.2-2' }}</td>
+            <td>{{ row.averageAmountPerDeliveredRide | currency:'INR':'symbol':'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

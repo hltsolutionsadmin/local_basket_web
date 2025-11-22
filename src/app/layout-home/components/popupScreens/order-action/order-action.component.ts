@@ -9,7 +9,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrl: './order-action.component.scss'
 })
 export class OrderActionComponent {
-  actionForm: FormGroup;
+   actionForm: FormGroup;
   
   constructor(
     public dialogRef: MatDialogRef<OrderActionComponent>,
@@ -22,8 +22,6 @@ export class OrderActionComponent {
     });
   }
 
-  // The updateNotes method is now only for the custom 'lib-hlt-text-area' component
-  // It updates the form control's value without triggering another event
   updateNotes(value: string) {
     this.actionForm.get('notes')?.setValue(value.trim());
   }

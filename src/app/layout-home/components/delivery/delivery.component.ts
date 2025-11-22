@@ -3,9 +3,8 @@ import { LayoutHomeService } from '../../service/layout-home.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { OrderActionComponent } from '../popupScreens/order-action/order-action.component';
-import { from, Subject } from 'rxjs';
+import { from, Subject, Subscription } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
-// import { KotPrintComponent } from '../popupScreens/kot-print/kot-print.component';
 import { ActivatedRoute } from '@angular/router';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { enIN } from 'date-fns/locale'; 
@@ -31,6 +30,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   expandedOrderId: number | null = null;
 
   private readonly destroy$ = new Subject<void>();
+  private pollingSubscription?: Subscription
 
   constructor(
     private orderService: LayoutHomeService,
@@ -69,11 +69,26 @@ export class DeliveryComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.fetchOrders(this.currentPageIndex, this.selectedOrder?.id || undefined);
       });
+
+      this.pollingSubscription = this.pollingService.newOrder$
+      .subscribe((order: any) => {
+        if (order.orderStatus === 'PLACED' || order.status === 'PLACED') {
+          console.log('New PLACED order detected → refreshing list immediately', order.orderNumber);
+          
+          // Reset to page 0 to show newest order at top
+          this.currentPageIndex = 0;
+          this.fetchOrders(0); // This brings the fresh order instantly
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
   }
 
   private handleFetchOrdersSuccess(response: any, orderIdParam?: string | null): void {
@@ -236,7 +251,10 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             this.snackBar.open('Order accepted successfully', 'Close', {
               duration: 3000,
             });
-            this.pollingService.notifyOrderStatusUpdated({ orderNumber: order.orderNumber, status: 'PREPARING' });
+            this.pollingService.notifyOrderStatusUpdated({
+            orderNumber: order.orderNumber,
+            status: 'PREPARING'
+          });
           } else {
             this.snackBar.open('Failed to approve order', 'Close', {
               duration: 3000,
@@ -270,6 +288,7 @@ export class DeliveryComponent implements OnInit, OnDestroy {
   }
 
   rejectOrder(order: Order, notes: string, updatedBy: string): void {
+    debugger;
     this.dialog
       .open(OrderActionComponent, {
         width: '400px',
@@ -285,8 +304,8 @@ export class DeliveryComponent implements OnInit, OnDestroy {
             .updateOrderStatus(
               order.orderNumber,
               'REJECTED',
-              result.notes,
-              result.updatedBy
+              '0',
+              result.notes
             )
             .pipe(takeUntil(this.destroy$))
             .subscribe({

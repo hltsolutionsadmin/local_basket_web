@@ -1,0 +1,230 @@
+.orders-list {
+  padding: 20px;
+  background: #f7f8fa;
+  border-radius: 12px;
+  min-height: 100%;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.Orders p {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.search-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-section input {
+  min-width: 220px;
+  max-width: 300px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid #dcdfe6;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-section input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.filter-btn {
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================
+   RESPONSIVE GRID – THIS IS THE KEY FIX
+============================ */
+.grid-container {
+  display: grid;
+  gap: 20px;
+  max-height: calc(100vh - 240px); /* Adjust based on your header height */
+  overflow-y: auto;
+  padding-right: 8px;
+
+  /* Clean scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #c7c7c7 transparent;
+}
+
+.grid-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.grid-container::-webkit-scrollbar-thumb {
+  background: #c7c7c7;
+  border-radius: 10px;
+}
+
+.order-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Important: prevents content leak */
+}
+
+.order-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #10b981; /* Green for Online */
+  color: white;
+}
+
+.order-number {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Body – grows to fill space */
+.order-details-left {
+  padding: 0 18px;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 12px;
+
+  /* Thin scrollbar inside card */
+  scrollbar-width: thin;
+}
+
+.order-details-left::-webkit-scrollbar {
+  width: 4px;
+}
+
+.order-details-left::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.item-list {
+  margin-top: 12px;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  gap: 10px;
+  font-size: 14.5px;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-quantity {
+  min-width: 110px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.item-name {
+  color: #374151;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* Footer buttons */
+.action-buttons {
+  padding: 14px 18px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  text-align: right;
+}
+
+.action-buttons button {
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.action-buttons button:hover {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+/* ============================
+   MOBILE OPTIMIZATIONS
+============================ */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    max-height: calc(100vh - 200px);
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-section input {
+    min-width: 100%;
+  }
+
+  .order-card {
+    max-height: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .orders-list {
+    padding: 12px;
+  }
+
+  .order-header, .order-details-left, .action-buttons {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
